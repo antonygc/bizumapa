@@ -4,7 +4,7 @@
 }
 .km-editor > .mask {
   display: block;
-  position: absolute;
+  position: relative;
   left: 0;
   right: 0;
   top: 0;
@@ -12,7 +12,7 @@
   background-color: transparent;
 }
 .km-editor > .receiver {
-  position: absolute;
+  position: relative;
   background: white;
   outline: none;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -50,7 +50,7 @@
   outline: none;
 }
 div.minder-editor-container {
-  position: absolute;
+  position: relative;
   top: 40px;
   bottom: 0;
   left: 0;
@@ -58,21 +58,22 @@ div.minder-editor-container {
   font-family: Arial, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 }
 .minder-editor {
-  position: absolute;
-  top: 92px;
+  position: relative;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  /*height: 100vh;*/
 }
 .minder-viewer {
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
 }
 .control-panel {
-  position: absolute;
+  position: relative;
   top: 0;
   right: 0;
   width: 250px;
@@ -80,7 +81,7 @@ div.minder-editor-container {
   border-left: 1px solid #CCC;
 }
 .minder-divider {
-  position: absolute;
+  position: relative;
   top: 0;
   right: 250px;
   bottom: 0;
@@ -325,7 +326,7 @@ div.minder-editor-container {
 }
 .search-result ul li span {
   display: block;
-  position: absolute;
+  position: relative;
   bottom: 0;
   height: 20px;
   background: rgba(0, 0, 0, 0.5);
@@ -492,7 +493,7 @@ div.minder-editor-container {
   border-left: 1px solid #babfcd;
   padding: 5px 10px;
   background: white;
-  position: absolute;
+  position: relative;
   top: 92px;
   right: 0;
   bottom: 0;
@@ -519,7 +520,7 @@ div.minder-editor-container {
   padding: 0;
 }
 .km-note .CodeMirror {
-  position: absolute;
+  position: relative;
   top: 41px;
   bottom: 0;
   height: auto;
@@ -533,7 +534,7 @@ div.minder-editor-container {
   padding: 3px 8px;
 }
 #previewer-content {
-  position: absolute;
+  position: relative;
   background: #FFD;
   padding: 5px 15px;
   border-radius: 5px;
@@ -754,7 +755,7 @@ div.minder-editor-container {
   border-bottom-left-radius: 4px;
 }
 .resource-editor .resource-dropdown .km-resource {
-  position: absolute;
+  position: relative;
   width: 154px;
   margin-bottom: 3px;
   padding: 0;
@@ -1406,7 +1407,7 @@ div a.theme-item {
   background-color: #c4d0ee;
 }
 .nav-bar {
-  position: absolute;
+  position: relative;
   width: 35px;
   height: 240px;
   padding: 5px 0;
@@ -1470,7 +1471,7 @@ div a.theme-item {
   overflow: visible;
 }
 .nav-bar .zoom-pan .origin {
-  position: absolute;
+  position: relative;
   width: 20px;
   height: 8px;
   left: -9px;
@@ -1485,10 +1486,10 @@ div a.theme-item {
   background: white;
   left: 7px;
   top: 3px;
-  position: absolute;
+  position: relative;
 }
 .nav-bar .zoom-pan .indicator {
-  position: absolute;
+  position: relative;
   width: 8px;
   height: 8px;
   left: -3px;
@@ -1500,7 +1501,7 @@ div a.theme-item {
   background: #fff;
   width: 140px;
   height: 120px;
-  position: absolute;
+  position: relative;
   left: 45px;
   bottom: 30px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);

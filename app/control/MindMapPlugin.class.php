@@ -23,7 +23,9 @@ class MindMapPlugin extends TPage
         TPage::include_css("lib/kitymind/bower_components/hotbox/hotbox.css" );
         TPage::include_css("lib/kitymind/bower_components/kityminder-core/dist/kityminder.core.css" );
         TPage::include_css("lib/kitymind/bower_components/color-picker/dist/color-picker.min.css");
-        TPage::include_css("lib/kitymind/kityminder.editor.min.css");
+        TPage::include_css("lib/kitymind/kityminder.editor.css");
+        #TPage::include_css("lib/kitymind/kityminder.editor.min.css");
+        #TPage::include_css("lib/kitymind/plugin.css");
 
         $kityMinder = new TElement('kityminder-editor');
         $kityMinder->{'on-init'} = 'initEditor(editor, minder)';
