@@ -21,23 +21,23 @@ class MindMapPlugin extends TPage
 
 
 
-        $content = file_get_contents("app/templates/theme3/login.html");
-        $content = file_get_contents("lib/kitymind/index.html");
-        $content = ApplicationTranslator::translateTemplate($content);
-        $content = AdiantiTemplateParser::parse($content);
+        // $content = file_get_contents("app/templates/theme3/login.html");
+        // $content = file_get_contents("lib/kitymind/index.html");
+        // $content = ApplicationTranslator::translateTemplate($content);
+        // $content = AdiantiTemplateParser::parse($content);
 
-        echo $content;
+        // echo $content;
 
 
-        // $iframe = new TElement('iframe');
-        // $iframe->id = "iframe_external";
-        // $iframe->src = "/bizumapa/lib/kitymind/index.html";
-        // $iframe->frameborder = "0";
-        // $iframe->scrolling = "yes";
-        // $iframe->width = "100%";
-        // $iframe->height = "700px";
+        $iframe = new TElement('iframe');
+        $iframe->id = "iframe_external";
+        $iframe->src = "/bizumapa/lib/kitymind/index.html";
+        $iframe->frameborder = "0";
+        $iframe->scrolling = "yes";
+        $iframe->width = "100%";
+        $iframe->height = "700px";
         
-        // parent::add($iframe);
+        parent::add($iframe);
 
         
     }
