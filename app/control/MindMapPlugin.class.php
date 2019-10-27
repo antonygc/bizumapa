@@ -18,36 +18,26 @@ class MindMapPlugin extends TPage
     {
         parent::__construct();
         
-        /*
-        $this->html = new THtmlRenderer('lib/local-kitymind-master/index.html');
-        #$this->html = new THtmlRenderer('app/resources/page_sample.html');
 
 
-        $replaces = [];
-        $replaces['title']  = 'Panel title';
-        $replaces['footer'] = 'Panel footer';
-        $replaces['name']   = 'Someone famous';
+
+        $content = file_get_contents("app/templates/theme3/login.html");
+        $content = file_get_contents("lib/kitymind/index.html");
+        $content = ApplicationTranslator::translateTemplate($content);
+        $content = AdiantiTemplateParser::parse($content);
+
+        echo $content;
+
+
+        // $iframe = new TElement('iframe');
+        // $iframe->id = "iframe_external";
+        // $iframe->src = "/bizumapa/lib/kitymind/index.html";
+        // $iframe->frameborder = "0";
+        // $iframe->scrolling = "yes";
+        // $iframe->width = "100%";
+        // $iframe->height = "700px";
         
-        // replace the main section variables
-        $this->html->enableSection('main', $replaces);
-
-        #echo var_dump($this->html);
-
-        $vbox = new TVBox;
-        $vbox->add($this->html);
-        parent::add($vbox);            
-        */
-
-
-        $iframe = new TElement('iframe');
-        $iframe->id = "iframe_external";
-        $iframe->src = "/bizumapa/lib/local-kitymind-master/";
-        $iframe->frameborder = "0";
-        $iframe->scrolling = "yes";
-        $iframe->width = "100%";
-        $iframe->height = "700px";
-        
-        parent::add($iframe);
+        // parent::add($iframe);
 
         
     }

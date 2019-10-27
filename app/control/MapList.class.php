@@ -140,6 +140,7 @@ class MapList extends TPage
 
 		#echo " <script> alert('ok') </script> ";
 
+
     }
     
     /**
