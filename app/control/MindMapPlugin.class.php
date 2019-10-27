@@ -17,28 +17,54 @@ class MindMapPlugin extends TPage
     public function __construct()
     {
         parent::__construct();
-        
 
+        TPage::include_css("lib/kitymind/bower_components/bootstrap/dist/css/bootstrap.css" );
+        TPage::include_css("lib/kitymind/bower_components/codemirror/lib/codemirror.css" );
+        TPage::include_css("lib/kitymind/bower_components/hotbox/hotbox.css" );
+        TPage::include_css("lib/kitymind/bower_components/kityminder-core/dist/kityminder.core.css" );
+        TPage::include_css("lib/kitymind/bower_components/color-picker/dist/color-picker.min.css");
+        TPage::include_css("lib/kitymind/kityminder.editor.min.css");
 
+        $kityMinder = new TElement('kityminder-editor');
+        $kityMinder->{'on-init'} = 'initEditor(editor, minder)';
+        $kityMinder->{'data-theme'} = 'fresh-green';
 
-        // $content = file_get_contents("app/templates/theme3/login.html");
-        // $content = file_get_contents("lib/kitymind/index.html");
-        // $content = ApplicationTranslator::translateTemplate($content);
-        // $content = AdiantiTemplateParser::parse($content);
+        $iFrame = new TElement('iframe');
+        $iFrame->{'name'} = 'frameFile';
+        $iFrame->{'style'} = 'display:none;';
 
-        // echo $content;
+        $mainController = new TElement('div');
+        $mainController->{'ng-app'} = 'kityminderDemo';
+        $mainController->{'ng-controller'} = 'MainController';
+        $mainController->add($kityMinder);
+        $mainController->add($iFrame);
 
+        $vbox = new TVBox;
+        $vbox->add($mainController);
 
-        $iframe = new TElement('iframe');
-        $iframe->id = "iframe_external";
-        $iframe->src = "/bizumapa/lib/kitymind/index.html";
-        $iframe->frameborder = "0";
-        $iframe->scrolling = "yes";
-        $iframe->width = "100%";
-        $iframe->height = "700px";
-        
-        parent::add($iframe);
+        parent::add($vbox);
+    
+        // TPage::include_js("lib/kitymind/bower_components/jquery/dist/jquery.js");
+        // TPage::include_js("lib/kitymind/bower_components/bootstrap/dist/js/bootstrap.js");
+        TPage::include_js("lib/kitymind/bower_components/angular/angular.js");
+        TPage::include_js("lib/kitymind/bower_components/angular-bootstrap/ui-bootstrap-tpls.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/lib/codemirror.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/mode/xml/xml.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/mode/javascript/javascript.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/mode/css/css.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/mode/htmlmixed/htmlmixed.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/mode/markdown/markdown.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/addon/mode/overlay.js");
+        TPage::include_js("lib/kitymind/bower_components/codemirror/mode/gfm/gfm.js");
+        TPage::include_js("lib/kitymind/bower_components/angular-ui-codemirror/ui-codemirror.js");
+        TPage::include_js("lib/kitymind/bower_components/marked/lib/marked.js");
+        TPage::include_js("lib/kitymind/bower_components/kity/dist/kity.min.js");
+        TPage::include_js("lib/kitymind/bower_components/hotbox/hotbox.js");
+        TPage::include_js("lib/kitymind/bower_components/json-diff/json-diff.js");
+        TPage::include_js("lib/kitymind/bower_components/kityminder-core/dist/kityminder.core.min.js");
+        TPage::include_js("lib/kitymind/bower_components/color-picker/dist/color-picker.min.js");
+        TPage::include_js("lib/kitymind/kityminder.editor.js");
+        TPage::include_js("lib/kitymind/diy.js");
 
-        
     }
 }

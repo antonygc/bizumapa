@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+
+
+
+    <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -70,7 +73,9 @@
 </script>
 
 
-
+<!--                  <?php
+              echo var_dump($_GET);
+          ?> -->
 
 
 </html>
