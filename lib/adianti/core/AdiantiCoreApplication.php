@@ -209,6 +209,14 @@ class AdiantiCoreApplication
         TScript::create("__adianti_load_page('{$query}');");
     }
     
+    public static function openPage($class, $method = NULL, $parameters = NULL)
+    {
+        $query = self::buildHttpQuery($class, $method, $parameters);
+        
+        TScript::create("__adianti_open_page('{$query}');");
+    }
+
+
     /**
      * Post data
      *

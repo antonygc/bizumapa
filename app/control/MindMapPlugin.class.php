@@ -69,4 +69,11 @@ class MindMapPlugin extends TPage
         TPage::include_js("lib/kitymind/diy.js");
 
     }
+
+
+        public function onLoad($parameters)
+    {
+
+        #echo var_dump($parameters);
+    }
 }

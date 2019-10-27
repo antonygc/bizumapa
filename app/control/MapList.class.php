@@ -136,7 +136,7 @@ class MapList extends TPage
         $key=$param['key'];
         #new TMessage('info', "The information is : $key");
 
-		AdiantiCoreApplication::loadPage('MindMapPlugin');
+		AdiantiCoreApplication::openPage('MindMapPlugin', 'onLoad', array("foo"=>"bar"));
 
 		#echo " <script> alert('ok') </script> ";
 
