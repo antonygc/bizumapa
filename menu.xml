@@ -1,4 +1,15 @@
 <menu>
+
+    <menuitem label='Aplicação'>
+        <icon>fa:file-text-o fa-fw</icon>
+        <menu>
+              <menuitem label='Mapas'>
+                  <icon>fa:cloud-upload fa-fw</icon>
+                  <action>MapList</action>
+              </menuitem>
+        </menu>
+    </menuitem>
+
     <menuitem label='_t{Administration}'>
         <icon>fa:university fa-fw</icon>
         <menu>
