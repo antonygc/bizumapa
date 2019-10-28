@@ -165,11 +165,33 @@ class MapList extends TPage
     {
         // new TMessage('info', 'Confirm1 : ' . json_encode($param));
 
-        $item = new StdClass;
-        $item->code     = '5';
-        $item->fname     = $param['fname'];
-        $item->ftype  = 'MAP';
-        $this->datagrid->addItem($item);
+        // $item = new StdClass;
+        // $item->code     = '5';
+        // $item->fname     = $param['fname'];
+        // $item->ftype  = 'MAP';
+        // $this->datagrid->addItem($item);
+
+		try 
+        { 
+	        TTransaction::open('communication'); // open transaction 
+
+	        $wd = new WorkingDirectory();
+	        $wd->wd_id = 1;
+	        $wd->wd_content = '{"teste":"qwerty"}';
+	        $wd->system_user_id = 1;
+	        $wd->store();
+                     
+            new TMessage('info', 'Object stored successfully'); 
+            TTransaction::close(); // Closes the transaction 
+        } 
+        catch (Exception $e) 
+        { 
+            new TMessage('error', $e->getMessage()); 
+        } 
+
+
+
+
     }
     
 
