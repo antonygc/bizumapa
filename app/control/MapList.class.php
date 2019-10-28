@@ -59,17 +59,17 @@ class MapList extends TPage
         
         // creates the datagrid model
         $this->datagrid->createModel();
-
-		$action = new TAction( [$this, 'onInputDialog'] );
-		$b2 = new TActionLink('Criar Pasta', $action, 'white', 10, '', 'fa:folder green');
-		$b2->class='btn btn-default btn-sm';
-		$b2->style='font-size:11pt';
+        
+        $action = new TAction( [$this, 'onInputDialog'] );
+        $quickForm = new TQuickForm();
+        $quickForm->addQuickAction('Criar Pasta', $action, 'fa:folder green');
         
         // wrap the page content using vertical box
         $vbox = new TVBox;
         $vbox->style = 'width: 100%';
         $vbox->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
-        $vbox->add(TPanelGroup::pack($b2, $this->datagrid));
+        $vbox->add($quickForm);
+        $vbox->add($this->datagrid);
 
         parent::add($vbox);
 
