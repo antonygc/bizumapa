@@ -17,25 +17,23 @@ class MapList extends TPage
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
         
         // create the datagrid columns
-        $code       = new TDataGridColumn('code',    'Code',    'right',  '10%');
-        $name       = new TDataGridColumn('name',    'Name',    'left',   '30%');
-        $address    = new TDataGridColumn('address', 'Address', 'left',   '30%');
-        $telephone  = new TDataGridColumn('fone',    'Phone',   'left',   '30%');
+        $code     = new TDataGridColumn('code',    'Code',    'right',  '10%');
+        $fname    = new TDataGridColumn('fname',    'Nome',    'center',   '30%');
+        $ftype    = new TDataGridColumn('ftype', 'Tipo', 'left',   '70%');
         
-        $telephone->setDataProperty('hiddable', 400);
+        #$telephone->setDataProperty('hiddable', 400);
         
         // add the columns to the datagrid
-        $this->datagrid->addColumn($code);
-        $this->datagrid->addColumn($name);
-        $this->datagrid->addColumn($address);
-        $this->datagrid->addColumn($telephone);
+        #$this->datagrid->addColumn($code);
+        $this->datagrid->addColumn($fname);
+        $this->datagrid->addColumn($ftype);
+        #$this->datagrid->addColumn($telephone);
         
         // creates two datagrid actions
         $action1 = new TDataGridAction(array($this, 'onView'));
-        $action1->setLabel('View name');
+        $action1->setLabel('View fname');
         $action1->setImage('fa:search #7C93CF');
-        $action1->setField('name');
-        $action1->setField('code');
+        $action1->setField('fname');
         
         $action2 = new TDataGridAction(array($this, 'onDelete'));
         $action2->setLabel('Try to delete');
@@ -43,17 +41,17 @@ class MapList extends TPage
         $action2->setField('code');
         
         $action3 = new TDataGridAction(array($this, 'onView'));
-        $action3->setLabel('View address');
+        $action3->setLabel('View ftype');
         $action3->setImage('bs:hand-right green');
-        $action3->setField('address');
+        $action3->setField('ftype');
         
-        $action_group = new TDataGridActionGroup('Actions ', 'bs:th');
+        $action_group = new TDataGridActionGroup('', 'bs:th');
         
-        $action_group->addHeader('Available Options');
+        #$action_group->addHeader('Opções');
         $action_group->addAction($action1);
         $action_group->addAction($action2);
         $action_group->addSeparator();
-        $action_group->addHeader('Another Options');
+        #$action_group->addHeader('Another Options');
         $action_group->addAction($action3);
         
         // add the actions to the datagrid
@@ -61,21 +59,24 @@ class MapList extends TPage
         
         // creates the datagrid model
         $this->datagrid->createModel();
+
+		$action = new TAction( [$this, 'onInputDialog'] );
+		$b2 = new TActionLink('Criar Pasta', $action, 'white', 10, '', 'fa:folder green');
+		$b2->class='btn btn-default btn-sm';
+		$b2->style='font-size:11pt';
         
         // wrap the page content using vertical box
         $vbox = new TVBox;
         $vbox->style = 'width: 100%';
         $vbox->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
-        #$vbox->add(TPanelGroup::pack(' ', $this->datagrid, 'footer'));
-
-        $vbox->add($this->datagrid);
+        $vbox->add(TPanelGroup::pack($b2, $this->datagrid));
 
         parent::add($vbox);
 
     }
 
 
-  /**
+  	/**
      * Load the data into the datagrid
      */
     function onReload()
@@ -85,34 +86,32 @@ class MapList extends TPage
         // add an regular object to the datagrid
         $item = new StdClass;
         $item->code     = '1';
-        $item->name     = 'Fábio Locatelli';
-        $item->address  = 'Rua Expedicionario';
-        $item->fone     = '1111-1111';
+        $item->fname     = 'Pasta1';
+        $item->ftype  = 'DIR';
         $this->datagrid->addItem($item);
         
         // add an regular object to the datagrid
         $item = new StdClass;
         $item->code     = '2';
-        $item->name     = 'Julia Haubert';
-        $item->address  = 'Rua Expedicionarios';
-        $item->fone     = '2222-2222';
+        $item->fname     = 'Pasta2';
+        $item->ftype  = 'DIR';
         $this->datagrid->addItem($item);
         
         // add an regular object to the datagrid
         $item = new StdClass;
         $item->code     = '3';
-        $item->name     = 'Carlos Ranzi';
-        $item->address  = 'Rua Oliveira';
-        $item->fone     = '3333-3333';
+        $item->fname     = 'Mapa Teste';
+        $item->ftype  = 'MAP';
         $this->datagrid->addItem($item);
         
         // add an regular object to the datagrid
         $item = new StdClass;
         $item->code     = '4';
-        $item->name     = 'Daline DallOglio';
-        $item->address  = 'Rua Oliveira';
-        $item->fone     = '4444-4444';
+        $item->fname     = 'Mapa Penal';
+        $item->ftype  = 'MAP';
         $this->datagrid->addItem($item);
+
+
     }
 
     /**
@@ -137,10 +136,6 @@ class MapList extends TPage
         #new TMessage('info', "The information is : $key");
 
 		AdiantiCoreApplication::openPage('MindMapPlugin', 'onLoad', array("foo"=>"bar"));
-
-		#echo " <script> alert('ok') </script> ";
-
-
     }
     
     /**
@@ -151,5 +146,31 @@ class MapList extends TPage
         $this->onReload();
         parent::show();
     }
+
+    public function onInputDialog( $param )
+    {
+
+        $form = new TQuickForm('input_form');
+        $form->style = 'padding:20px';
+        $form->addQuickField('Nome:', new TEntry('fname'));
+        $form->addQuickAction('Criar', new TAction([$this, 'onConfirm']), 'fa:save green');
+
+        new TInputDialog('Criar Pasta', $form);
+    }
+
+    /**
+     * Show the input dialog data
+     */
+    public function onConfirm( $param )
+    {
+        // new TMessage('info', 'Confirm1 : ' . json_encode($param));
+
+        $item = new StdClass;
+        $item->code     = '5';
+        $item->fname     = $param['fname'];
+        $item->ftype  = 'MAP';
+        $this->datagrid->addItem($item);
+    }
+    
 
 }
