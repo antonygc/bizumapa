@@ -10,6 +10,9 @@
  */
 class MapList extends TPage
 {
+
+	private $current_wd;
+
     public function __construct()
     {
         parent::__construct();
@@ -64,11 +67,17 @@ class MapList extends TPage
         $quickForm = new TQuickForm();
         $quickForm->addQuickAction('Criar Pasta', $action, 'fa:folder green');
         
-        // wrap the page content using vertical box
+        $wrapper = new TElement('h2');
+        $wrapper->add('Navegação');
+
+        $hbox = new THBox;
+        $hbox->add($wrapper);
+        $hbox->add($quickForm);
+
         $vbox = new TVBox;
         $vbox->style = 'width: 100%';
         $vbox->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
-        $vbox->add($quickForm);
+        $vbox->add($hbox);
         $vbox->add($this->datagrid);
 
         parent::add($vbox);
@@ -81,37 +90,37 @@ class MapList extends TPage
      */
     function onReload()
     {
+    	// echo json_encode($_SESSION);
+        try
+        {
+            TTransaction::open('communication');
+            $wd = new WorkingDirectory($_SESSION['bizumapa']['userid']);
+            TTransaction::close();
+        }
+        catch (Exception $e)
+        {
+        	return;
+            // new TMessage('error', $e->getMessage());
+        }
+
         $this->datagrid->clear();
-        
-        // add an regular object to the datagrid
-        $item = new StdClass;
-        $item->code     = '1';
-        $item->fname     = 'Pasta1';
-        $item->ftype  = 'DIR';
-        $this->datagrid->addItem($item);
-        
-        // add an regular object to the datagrid
-        $item = new StdClass;
-        $item->code     = '2';
-        $item->fname     = 'Pasta2';
-        $item->ftype  = 'DIR';
-        $this->datagrid->addItem($item);
-        
-        // add an regular object to the datagrid
-        $item = new StdClass;
-        $item->code     = '3';
-        $item->fname     = 'Mapa Teste';
-        $item->ftype  = 'MAP';
-        $this->datagrid->addItem($item);
-        
-        // add an regular object to the datagrid
-        $item = new StdClass;
-        $item->code     = '4';
-        $item->fname     = 'Mapa Penal';
-        $item->ftype  = 'MAP';
-        $this->datagrid->addItem($item);
 
+        // if (is_null($wd)) {
+        // 	new TMessage('error', 'nulo');
+        // } else {
+        // 	new TMessage('error', 'nao nulo');
+        // }
+        
+        $wd = json_decode($wd->wd_content);
 
+        foreach ($wd as $index => $file) {
+			// echo var_dump($key), var_dump($value);        	
+			$item = new StdClass;
+	        $item->code  = $file->id;
+	        $item->fname = $file->name;
+	        $item->ftype = ($file->type=='DIR') ? 'Diretório' : 'Mapa Mental' ;
+	        $this->datagrid->addItem($item);
+        }
     }
 
     /**
@@ -163,25 +172,23 @@ class MapList extends TPage
      */
     public function onConfirm( $param )
     {
-        // new TMessage('info', 'Confirm1 : ' . json_encode($param));
-
-        // $item = new StdClass;
-        // $item->code     = '5';
-        // $item->fname     = $param['fname'];
-        // $item->ftype  = 'MAP';
-        // $this->datagrid->addItem($item);
-
 		try 
         { 
 	        TTransaction::open('communication'); // open transaction 
 
+			$content = new StdClass;
+			$content->id = uniqid();
+			$content->name = $param['fname'];
+			$content->type = 'DIR';
+			$content->children = [];
+
+
 	        $wd = new WorkingDirectory();
-	        $wd->wd_id = 1;
-	        $wd->wd_content = '{"teste":"qwerty"}';
-	        $wd->system_user_id = 1;
+	        $wd->wd_content = json_encode([$content]);
+	        $wd->system_user_id = $_SESSION['bizumapa']['userid'];
 	        $wd->store();
                      
-            new TMessage('info', 'Object stored successfully'); 
+            new TMessage('info', 'Pasta criada com sucesso'); 
             TTransaction::close(); // Closes the transaction 
         } 
         catch (Exception $e) 
