@@ -4,6 +4,9 @@
  * https://github.com/alexantr/filemanager
  */
 
+
+// echo var_dump($_SERVER);
+
 // Auth with login/password (set true/false to enable/disable it)
 $use_auth = false;
 
@@ -716,16 +719,6 @@ if (isset($_GET['copy']) && !isset($_GET['finish'])) {
 
 // file viewer
 if (isset($_GET['view'])) {
-    
-
-    // Mofificacao BizuMapa
-    ?>    
-    <script>
-        window.top.location.href = 
-        "http://127.0.0.1/bizumapa/index.php?class=MindMapPlugin";
-    </script>
-    <?php
-
 
     $file = $_GET['view'];
     $file = fm_clean_path($file);
@@ -734,6 +727,24 @@ if (isset($_GET['view'])) {
         fm_set_msg('File not found', 'error');
         fm_redirect(FM_SELF_URL . '?p=' . urlencode(FM_PATH));
     }
+
+    //Mofificacao BizuMapa
+    $query = http_build_query(array(
+        'class'=>'MindMapPlugin', 
+        'p'=>$_GET['p'], 
+        'view'=>$_GET['view']));
+
+    $location = '/' .
+                explode('/', $_SERVER['PHP_SELF'])[1] . 
+                '/' .
+                'index.php?' . 
+                $query;
+
+    ?> 
+    <script>
+        window.top.location.href = "<?php echo $location; ?>";
+    </script>
+    <?php
 
     fm_show_header(); // HEADER
     fm_show_nav_path(FM_PATH); // current path
@@ -974,8 +985,11 @@ $all_files_size = 0;
 <input type="hidden" name="group" value="1">
 <table><tr>
 <th style="width:3%"><label><input type="checkbox" title="Invert selection" onclick="checkbox_toggle()"></label></th>
-<th>Name</th><th style="width:10%">Size</th>
-<th style="width:12%">Modified</th>
+<th>Nome</th>
+
+<!--<th style="width:10%">Modificado</th>-->
+
+<th style="width:20%" >Ações</th>
 <?php
 // link to parent folder
 if ($parent !== false) {
@@ -999,7 +1013,8 @@ foreach ($folders as $f) {
 <tr>
 <td><label><input type="checkbox" name="file[]" value="<?php echo fm_enc($f) ?>"></label></td>
 <td><div class="filename"><a href="?p=<?php echo urlencode(trim(FM_PATH . '/' . $f, '/')) ?>"><i class="<?php echo $img ?>"></i> <?php echo fm_enc(fm_convert_win($f)) ?></a><?php echo ($is_link ? ' &rarr; <i>' . fm_enc(readlink($path . '/' . $f)) . '</i>' : '') ?></div></td>
-<td><?php echo $modif ?></td>
+
+<!--<td><?php echo $modif ?></td>-->
 
 <td>
 <a title="Delete" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($f) ?>" onclick="return confirm('Delete folder?');"><i class="icon-cross"></i></a>
@@ -1031,7 +1046,9 @@ foreach ($files as $f) {
 <tr>
 <td><label><input type="checkbox" name="file[]" value="<?php echo fm_enc($f) ?>"></label></td>
 <td><div class="filename"><a href="<?php echo fm_enc($filelink) ?>" title="File info"><i class="<?php echo $img ?>"></i> <?php echo fm_enc(fm_convert_win($f)) ?></a><?php echo ($is_link ? ' &rarr; <i>' . fm_enc(readlink($path . '/' . $f)) . '</i>' : '') ?></div></td>
-<td><?php echo $modif ?></td>
+
+<!--<td><?php echo $modif ?></td>-->
+
 <td>
 <a title="Delete" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;del=<?php echo urlencode($f) ?>" onclick="return confirm('Delete file?');"><i class="icon-cross"></i></a>
 <a title="Rename" href="#" onclick="rename('<?php echo fm_enc(FM_PATH) ?>', '<?php echo fm_enc($f) ?>');return false;"><i class="icon-rename"></i></a>
@@ -1049,18 +1066,24 @@ if (empty($folders) && empty($files)) {
 <?php
 } else {
     ?>
-<tr><td class="gray"></td><td class="gray" colspan="<?php echo !FM_IS_WIN ? '6' : '4' ?>">
+<tr>
+
+<!--    
+<td></td><td class="gray" colspan="<?php echo !FM_IS_WIN ? '6' : '4' ?>">
 Full size: <span title="<?php printf('%s bytes', $all_files_size) ?>"><?php echo fm_get_filesize($all_files_size) ?></span>,
 files: <?php echo $num_files ?>,
 folders: <?php echo $num_folders ?>
-</td></tr>
+</td>
+-->
+
+</tr>
 <?php
 }
 ?>
 </table>
-<p class="path"><a href="#" onclick="select_all();return false;"><i class="icon-checkbox"></i> Select all</a> &nbsp;
-<a href="#" onclick="unselect_all();return false;"><i class="icon-checkbox_uncheck"></i> Unselect all</a> &nbsp;
-<a href="#" onclick="invert_all();return false;"><i class="icon-checkbox_invert"></i> Invert selection</a></p>
+<p class="path"><a href="#" onclick="select_all();return false;"><i class="icon-checkbox"></i> Selecionar tudo</a> &nbsp;
+<a href="#" onclick="unselect_all();return false;"><i class="icon-checkbox_uncheck"></i> Selecionar nenhum</a> &nbsp;
+<!--<a href="#" onclick="invert_all();return false;"><i class="icon-checkbox_invert"></i> Invert selection</a></p>-->
 <p><input type="submit" name="delete" value="Delete" onclick="return confirm('Delete selected files and folders?')">
 <input type="submit" name="zip" value="Pack" onclick="return confirm('Create archive?')">
 <input type="submit" name="copy" value="Copy"></p>
@@ -1719,7 +1742,7 @@ function fm_show_header()
 <meta charset="utf-8">
 <style>
 html,body,div,span,p,pre,a,code,em,img,small,strong,ol,ul,li,form,label,table,tr,th,td{margin:0;padding:0;vertical-align:baseline;outline:none;font-size:100%;background:transparent;border:none;text-decoration:none}
-html{overflow-y:scroll}body{padding:0;font:15px/16px Tahoma,Arial,sans-serif;color:#222;background:#efefef}
+html{overflow-y:scroll}body{padding:0;font:17px/16px Tahoma,Arial,sans-serif;color:#222;background:#ffffff}
 input,select,textarea,button{font-size:inherit;font-family:inherit}
 a{color:#296ea3;text-decoration:none}a:hover{color:#b00}img{vertical-align:middle;border:none}
 a img{border:none}span.gray{color:#777}small{font-size:11px;color:#999}p{margin-bottom:10px}

@@ -24,7 +24,7 @@ class MapList extends TPage
         $iframe->id = "iframe_external";
         $iframe->src = "/bizumapa/filemanager.php";
         $iframe->frameborder = "0";
-        $iframe->scrolling = "yes";
+        $iframe->scrolling = "auto";
         $iframe->width = "100%";
         $iframe->height = "700px";
         
