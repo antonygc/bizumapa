@@ -17,6 +17,28 @@ class MapList extends TPage
     {
         parent::__construct();
 
+
+        echo '<script>var orderNo = 2;</script>';
+
+        $iframe = new TElement('iframe');
+        $iframe->id = "iframe_external";
+        $iframe->src = "/bizumapa/filemanager.php";
+        $iframe->frameborder = "0";
+        $iframe->scrolling = "yes";
+        $iframe->width = "100%";
+        $iframe->height = "700px";
+        
+        $vbox = new TVBox;
+        $vbox->style = 'width: 100%';
+        $vbox->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
+        $vbox->add($iframe);
+
+        parent::add($vbox);
+
+        #require 'filemanager.php';
+
+        return;
+
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
         
         // create the datagrid columns
@@ -152,7 +174,7 @@ class MapList extends TPage
      */
     function show()
     {
-        $this->onReload();
+        #$this->onReload();
         parent::show();
     }
 
@@ -196,10 +218,6 @@ class MapList extends TPage
             new TMessage('error', $e->getMessage()); 
         } 
 
-
-
-
     }
-    
 
 }
