@@ -18,7 +18,7 @@ class MapList extends TPage
         parent::__construct();
 
 
-        echo '<script>var orderNo = 2;</script>';
+        // echo '<script>var orderNo = 2;</script>';
 
         $iframe = new TElement('iframe');
         $iframe->id = "iframe_external";
