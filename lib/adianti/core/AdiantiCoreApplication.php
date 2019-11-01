@@ -213,6 +213,7 @@ class AdiantiCoreApplication
     {
         $query = self::buildHttpQuery($class, $method, $parameters);
         
+        // Abre página em outra aba no navegador
         TScript::create("__adianti_open_page('{$query}');");
     }
 

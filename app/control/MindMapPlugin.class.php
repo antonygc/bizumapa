@@ -9,42 +9,47 @@
  * @copyright  Copyright (c) 2006 Adianti Solutions Ltd. (http://www.adianti.com.br)
  * @license    http://www.adianti.com.br/framework-license
  */
+
 class MindMapPlugin extends TPage
 {
-    /**
-     * Constructor method
-     */
+
+    private $mindmap_path;
+    private $mindmap_name;
+    private $mindmap_content;
+
     public function __construct()
     {
+
         parent::__construct();
 
-        $loaded = $this->loadUserdata();
+        $is_loaded = $this->loadUserData();
 
-        if ($loaded) {    
+        if ($is_loaded) {    
             $this->includePluginCSS();
             $this->includepluginHTML();
             $this->includepluginJS();
 
         } else {
+
             AdiantiCoreApplication::loadPage('MapList');
         }
     }
 
-    function loadUserdata()
+    function loadUserData()
     {
         if ($_GET)
         {
-            $path  = isset($_GET['p'])  ? $_GET['p']  : NULL;
-            $fname = isset($_GET['view']) ? $_GET['view'] : NULL;
+            $this->mindmap_path = isset($_GET['p'])  ? $_GET['p']  : NULL;
+            $this->mindmap_name = isset($_GET['view']) ? $_GET['view'] : NULL;
             
-            if ($path and $fname)
+            if ($this->mindmap_path and $this->mindmap_name)
             {
                 $root = $_SERVER['DOCUMENT_ROOT'].'/bizumapa/userdata';
-                $full_path = implode('/', [$root, $path, $fname]);                
-                $fcontent = file_get_contents($full_path);
+                $full_path = implode('/', [$root, $this->mindmap_path, $this->mindmap_name]);                
+                $this->mindmap_content = file_get_contents($full_path);
 
-                if ($fcontent) {
-                    $this->loadJsonMindMap($fcontent);
+                if ($this->mindmap_content) {
+                    $this->loadMindMap();
                     return true;
                 } else {
                     new TMessage('error', 'Mapa não encontrado' );
@@ -59,9 +64,49 @@ class MindMapPlugin extends TPage
         }
     }
 
-    function loadJsonMindMap($jsonstr)
+    function saveUserData()
     {
-        echo "<script id='userdata'>var userData = '". $jsonstr ."';</script>";
+
+
+        new TMessage('error', '5888888888888' );
+        
+        if ($_GET)
+        {
+            // $this->mindmap_path = isset($_POST['mindmap_path'])  ? $_POST['mindmap_path']  : NULL;
+            // $this->mindmap_name = isset($_POST['mindmap_name']) ? $_POST['mindmap_name'] : NULL;
+            // $this->mindmap_content = isset($_POST['mindmap_name']) ? $_POST['mindmap_name'] : NULL;
+            
+            if ($this->mindmap_path and $this->mindmap_name and $this->mindmap_content)
+            {
+                $root = $_SERVER['DOCUMENT_ROOT'].'/bizumapa/userdata';
+                $full_path = implode('/', [$root, $this->mindmap_path, $this->mindmap_name]);
+
+                new TMessage('error', $full_path );
+
+                file_put_contents($full_path, $this->mindmap_content);
+
+                if ($this->mindmap_content) {
+                    return true;
+                } else {
+                    new TMessage('error', 'Mapa não encontrado' );
+                    return false;
+                }
+            }
+            else
+            {
+                // new TMessage('error', 'Erro ao recuperar Mapa Mental');
+                return false;
+            }
+        }
+    }
+
+    function loadMindMap()
+    {
+        echo "<script>
+            var mindmap_path = '". $this->mindmap_path ."';
+            var mindmap_name = '". $this->mindmap_name ."';
+            var mindmap_content = '". $this->mindmap_content ."';
+            </script>";
     }
 
     function includePluginCSS()
