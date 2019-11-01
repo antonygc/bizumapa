@@ -18,9 +18,9 @@ class MindMapPlugin extends TPage
     {
         parent::__construct();
 
-        $userdata = $this->loadUserdata();
+        $loaded = $this->loadUserdata();
 
-        if ($userdata) {    
+        if ($loaded) {    
             $this->includePluginCSS();
             $this->includepluginHTML();
             $this->includepluginJS();
@@ -47,13 +47,13 @@ class MindMapPlugin extends TPage
                     $this->loadJsonMindMap($fcontent);
                     return true;
                 } else {
-                    new TMessage('error', 'Mapa não encontrado!' );
+                    new TMessage('error', 'Mapa não encontrado' );
                     return false;
                 }
             }
             else
             {
-                new TMessage('error', 'Erro ao pesquisar Mapa Mental');
+                new TMessage('error', 'Erro ao recuperar Mapa Mental');
                 return false;
             }
         }
@@ -61,20 +61,8 @@ class MindMapPlugin extends TPage
 
     function loadJsonMindMap($jsonstr)
     {
-
-
-        echo "<script>var userData = '". $jsonstr ."';</script>";
-        // echo(
-        //     "<script id='qwerty'>
-        //     window.onload = function() {
-        //         editor.minder.importData('json', '" . $jsonstr ."').then(
-        //             function(data){
-        //                 //$(fileInput).val('');
-        //             });
-        //     }
-        //     </script>");
+        echo "<script id='userdata'>var userData = '". $jsonstr ."';</script>";
     }
-
 
     function includePluginCSS()
     {
@@ -87,7 +75,6 @@ class MindMapPlugin extends TPage
         TPage::include_css($pre_path . "/bower_components/color-picker/dist/color-picker.min.css");
         TPage::include_css($pre_path . "/kityminder.editor.css");
         #TPage::include_css("lib/kityminder/kityminder.editor.min.css");
-        #TPage::include_css("lib/kityminder/plugin.css");
     }
 
     function includePluginHTML()

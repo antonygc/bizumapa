@@ -1,9 +1,9 @@
 <menu>
 
-    <menuitem label='Aplicação'>
+    <menuitem label='Mapas'>
         <icon>fa:file-text-o fa-fw</icon>
         <menu>
-              <menuitem label='Mapas'>
+              <menuitem label='Meus Mapas'>
                   <icon>fa:cloud-upload fa-fw</icon>
                   <action>MapList</action>
               </menuitem>
