@@ -20,6 +20,13 @@ class MindMapPlugin extends TPage
     public function __construct()
     {
 
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+         // The request is using the POST method
+            return;
+        }
+
+        
         parent::__construct();
 
         $is_loaded = $this->loadUserData();
@@ -33,6 +40,12 @@ class MindMapPlugin extends TPage
 
             AdiantiCoreApplication::loadPage('MapList');
         }
+    }
+
+    public function show($value='')
+    {
+        # code...
+        echo "string";
     }
 
     function loadUserData()
