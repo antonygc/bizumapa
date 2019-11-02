@@ -11,7 +11,7 @@ class MindMapRestService extends AdiantiRecordService
     }
 
 
-public function delete($param)
+	public function delete($param)
     {
 		return 'Não implementado';
     }
@@ -22,7 +22,26 @@ public function delete($param)
      */
     public function store($param)
     {
-		return 'implementado';
+
+	    $mindmap_path = isset($param['mindmap_path']) ? $param['mindmap_path'] : '';
+	    $mindmap_name = isset($param['mindmap_name']) ? $param['mindmap_name'] : '';
+	    $mindmap_content = isset($param['mindmap_content']) ? $param['mindmap_content'] : '';
+
+		$root = $_SERVER['DOCUMENT_ROOT'].'/bizumapa/userdata';
+        $full_path = implode('/', [$root, $mindmap_path, $mindmap_name]);
+
+
+        try {
+
+        	file_put_contents($full_path, $mindmap_content);
+        	
+        } catch (Exception $e) {
+
+        	return var_dump($e);
+        	
+        }
+
+		return 'OK';
     }
     
     /**
@@ -53,7 +72,7 @@ public function delete($param)
         
         unset($param['class']);
         unset($param['method']);
-        $param['data'] = $param;
+        // $param['data'] = $param;
         
         switch( $method )
         {
