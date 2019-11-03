@@ -1,6 +1,8 @@
 <?php
 // define the autoloader
 require_once 'lib/adianti/core/AdiantiCoreLoader.php';
+require_once 'app/control/custom/MindMapUtils.php';
+
 spl_autoload_register(array('Adianti\Core\AdiantiCoreLoader', 'autoload'));
 Adianti\Core\AdiantiCoreLoader::loadClassMap();
 

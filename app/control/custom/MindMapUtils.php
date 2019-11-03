@@ -6,7 +6,6 @@ class MindMapUtils
 	public static function getFrameVBox($class)
 	{
 		$iframe = new TElement('iframe');
-        // $iframe->id = "iframe_external";
         $iframe->src = "filemanager.php";
         $iframe->frameborder = "0";
         $iframe->scrolling = "auto";
@@ -19,5 +18,28 @@ class MindMapUtils
         $vbox->add($iframe);
 
         return $vbox;
+	}
+
+	public static function getMindMapFullPath($mappath, $mapname)
+	{
+        $scope = TSession::getValue('scope');
+        $userid = TSession::getValue('userid');
+
+        $root = $_SERVER['DOCUMENT_ROOT'] . '/userdata/';
+
+        if ($scope == 'public') {
+
+            $root = $root . 'public';
+
+        } elseif ($scope == 'private') {
+
+            $root = $root . $userid;
+
+        } else {
+
+            die(__CLASS__ . ': Não foi possível determinar escopo');
+        }
+
+        return implode('/', [$root, $mappath, $mapname]);
 	}
 }

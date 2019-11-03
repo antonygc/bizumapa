@@ -1,10 +1,7 @@
 <?php
 
-require_once 'app/control/custom/MindMapUtils.php';
-
 class PrivateMindMap extends TPage
 {
-
     public function __construct()
     {
         parent::__construct();

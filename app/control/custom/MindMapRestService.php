@@ -8,8 +8,7 @@ class MindMapRestService extends AdiantiRecordService
     public function load($param)
     {
     	#require 'filemanager.php';
-		#return 'Não implementado';
-        return $_SESSION;
+		return 'Não implementado';
     }
 
 
@@ -26,17 +25,15 @@ class MindMapRestService extends AdiantiRecordService
     public function store($param)
     {
 
-	    $mindmap_path = isset($param['mindmap_path']) ? $param['mindmap_path'] : '';
-	    $mindmap_name = isset($param['mindmap_name']) ? $param['mindmap_name'] : '';
-	    $mindmap_content = isset($param['mindmap_content']) ? $param['mindmap_content'] : '';
+	    $mappath = isset($param['mindmap_path']) ? $param['mindmap_path'] : '';
+	    $mapname = isset($param['mindmap_name']) ? $param['mindmap_name'] : '';
+	    $mapcontent = isset($param['mindmap_content']) ? $param['mindmap_content'] : '';
 
-		$root = $_SERVER['DOCUMENT_ROOT'].'/bizumapa/userdata';
-        $full_path = implode('/', [$root, $mindmap_path, $mindmap_name]);
-
+        $fullpath = MindMapUtils::getMindMapFullPath($mappath, $mapname);
 
         try {
 
-        	file_put_contents($full_path, $mindmap_content);
+        	file_put_contents($fullpath, $mapcontent);
         	
         } catch (Exception $e) {
 

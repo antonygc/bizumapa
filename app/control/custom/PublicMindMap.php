@@ -2,7 +2,6 @@
 
 class PublicMindMap extends TPage
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -13,7 +12,5 @@ class PublicMindMap extends TPage
         $vbox = MindMapUtils::getFrameVBox(__CLASS__);
 
         parent::add($vbox);
-
     }
-      
 }

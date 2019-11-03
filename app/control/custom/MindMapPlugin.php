@@ -1,7 +1,5 @@
 <?php
 
-require_once 'app/control/custom/MindMapUtils.php';
-
 class MindMapPlugin extends TPage
 {
     private $mindmap_path;
@@ -28,87 +26,33 @@ class MindMapPlugin extends TPage
 
     function loadUserData()
     {
-        if ($_GET)
+        if (isset($_GET))
         {
-            $this->mindmap_path = isset($_GET['p'])  ? $_GET['p']  : NULL;
-            $this->mindmap_name = isset($_GET['view']) ? $_GET['view'] : NULL;
-            
-            if ($this->mindmap_name)
-            {
 
-                $scope = TSession::getValue('scope');
-                $userid = TSession::getValue('userid');
-                $root = $_SERVER['DOCUMENT_ROOT'] . '/userdata/';
+            $mappath = isset($_GET['p'])  ? $_GET['p']  : NULL;
+            $mapname = isset($_GET['view']) ? $_GET['view'] : NULL;
 
-                if ($scope == 'public') {
-                    $root = $root . 'public';
-                } elseif ($scope == 'private') {
-                    $root = $root . $userid;
-                } else {
-                    die('Não permitido');
-                }
+            $full_path = MindMapUtils::getMindMapFullPath($mappath, $mapname);
 
-                $full_path = implode('/', [$root, $this->mindmap_path, $this->mindmap_name]);                
-                $this->mindmap_content = file_get_contents($full_path);
+            $mapcontent = file_get_contents($full_path);
 
-                if ($this->mindmap_content) {
-                    $this->loadMindMap();
-                    return true;
-                } else {
-                    new TMessage('error', 'Mapa não encontrado' );
-                    return false;
-                }
+            if ($mapcontent) {
+                $this->loadMindMap($mappath, $mapname, $mapcontent);
+                return true;
             }
-            else
-            {
-                new TMessage('error', 'Erro ao recuperar Mapa Mental');
-                return false;
-            }
+
+            new TMessage('error', 'Erro ao recuperar Mapa Mental');
+            return false;
         }
     }
 
-    function saveUserData()
-    {
 
-
-        new TMessage('error', '5888888888888' );
-        
-        if ($_GET)
-        {
-            // $this->mindmap_path = isset($_POST['mindmap_path'])  ? $_POST['mindmap_path']  : NULL;
-            // $this->mindmap_name = isset($_POST['mindmap_name']) ? $_POST['mindmap_name'] : NULL;
-            // $this->mindmap_content = isset($_POST['mindmap_name']) ? $_POST['mindmap_name'] : NULL;
-            
-            if ($this->mindmap_path and $this->mindmap_name and $this->mindmap_content)
-            {
-                $root = $_SERVER['DOCUMENT_ROOT'].'/bizumapa/userdata';
-                $full_path = implode('/', [$root, $this->mindmap_path, $this->mindmap_name]);
-
-                new TMessage('error', $full_path );
-
-                file_put_contents($full_path, $this->mindmap_content);
-
-                if ($this->mindmap_content) {
-                    return true;
-                } else {
-                    new TMessage('error', 'Mapa não encontrado' );
-                    return false;
-                }
-            }
-            else
-            {
-                // new TMessage('error', 'Erro ao recuperar Mapa Mental');
-                return false;
-            }
-        }
-    }
-
-    function loadMindMap()
+    function loadMindMap($mappath, $mapname, $mapcontent)
     {
         echo "<script>
-            var mindmap_path = '". $this->mindmap_path ."';
-            var mindmap_name = '". $this->mindmap_name ."';
-            var mindmap_content = '". $this->mindmap_content ."';
+            var mindmap_path = '". $mappath ."';
+            var mindmap_name = '". $mapname ."';
+            var mindmap_content = '". $mapcontent ."';
             </script>";
     }
 
@@ -174,7 +118,5 @@ class MindMapPlugin extends TPage
         TPage::include_js($pre_path . "/kityminder.editor.js");
         TPage::include_js($pre_path . "/diy.js");
     }
-
-  
 
 }
