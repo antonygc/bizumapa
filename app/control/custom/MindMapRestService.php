@@ -7,12 +7,15 @@ class MindMapRestService extends AdiantiRecordService
 
     public function load($param)
     {
-		return 'Não implementado';
+    	#require 'filemanager.php';
+		#return 'Não implementado';
+        return $_SESSION;
     }
 
 
 	public function delete($param)
     {
+
 		return 'Não implementado';
     }
     

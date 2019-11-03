@@ -1,11 +1,13 @@
 <?php
-/**
- * PHP File Manager (2017-08-07)
- * https://github.com/alexantr/filemanager
- */
+
+require_once 'init.php';
+require_once 'app/control/custom/MindMapUtils.php';
 
 
-// echo var_dump($_SERVER);
+// $vbox = MindMapUtils::loadFrame();
+
+session_id($_COOKIE['PHPSESSID']);
+session_start();
 
 // Auth with login/password (set true/false to enable/disable it)
 $use_auth = false;
@@ -24,11 +26,20 @@ $highlightjs_style = 'vs';
 // Default timezone for date() and time() - http://php.net/manual/en/timezones.php
 $default_timezone = 'Europe/Minsk'; // UTC+3
 
+
+$scope = $_SESSION['bizumapa']['scope'];
+
 // Root path for file manager
-$root_path = $_SERVER['DOCUMENT_ROOT'].'/bizumapa/userdata';
+$root_path = $_SERVER['DOCUMENT_ROOT'] . '/userdata/';
 
-// echo var_dump($_SERVER);
-
+if ($scope == 'public') {
+    $root_path = $root_path . 'public';
+} elseif ($scope == 'private') {
+    $root_path = $root_path . $_SESSION['bizumapa']['userid'];
+} else {
+    die('Não permitido');
+}
+    
 // Root url for links in file manager.Relative to $http_host. Variants: '', 'path/to/subfolder'
 // Will not working if $root_path will be outside of server document root
 $root_url = '';
@@ -195,11 +206,11 @@ if (isset($_GET['new'])) {
             $path .= '/' . FM_PATH;
         }
         if (fm_mkdir($path . '/' . $new, false) === true) {
-            fm_set_msg(sprintf('Folder <b>%s</b> created', fm_enc($new)));
+            fm_set_msg(sprintf('Pasta <b>%s</b> criada', fm_enc($new)));
         } elseif (fm_mkdir($path . '/' . $new, false) === $path . '/' . $new) {
-            fm_set_msg(sprintf('Folder <b>%s</b> already exists', fm_enc($new)), 'alert');
+            fm_set_msg(sprintf('Pasta <b>%s</b> já existe', fm_enc($new)), 'alert');
         } else {
-            fm_set_msg(sprintf('Folder <b>%s</b> not created', fm_enc($new)), 'error');
+            fm_set_msg(sprintf('Pasta <b>%s</b> não criada', fm_enc($new)), 'error');
         }
     } else {
         fm_set_msg('Wrong folder name', 'error');
@@ -241,9 +252,9 @@ if (isset($_GET['copy'], $_GET['finish'])) {
             }
         } else {
             if (fm_rcopy($from, $dest)) {
-                fm_set_msg(sprintf('Copyied from <b>%s</b> to <b>%s</b>', fm_enc($copy), fm_enc($msg_from)));
+                fm_set_msg(sprintf('Copiado de <b>%s</b> para <b>%s</b>', fm_enc($copy), fm_enc($msg_from)));
             } else {
-                fm_set_msg(sprintf('Error while copying from <b>%s</b> to <b>%s</b>', fm_enc($copy), fm_enc($msg_from)), 'error');
+                fm_set_msg(sprintf('Erro ao copiar <b>%s</b> para <b>%s</b>', fm_enc($copy), fm_enc($msg_from)), 'error');
             }
         }
     } else {
@@ -1062,7 +1073,7 @@ foreach ($files as $f) {
 
 if (empty($folders) && empty($files)) {
     ?>
-<tr><td></td><td colspan="<?php echo !FM_IS_WIN ? '6' : '4' ?>"><em>Folder is empty</em></td></tr>
+<tr><td></td><td colspan="<?php echo !FM_IS_WIN ? '6' : '4' ?>"><em>Pasta vazia</em></td></tr>
 <?php
 } else {
     ?>

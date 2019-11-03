@@ -1,18 +1,9 @@
 <?php
-/**
- * SinglePageView
- *
- * @version    1.0
- * @package    samples
- * @subpackage tutor
- * @author     Pablo Dall'Oglio
- * @copyright  Copyright (c) 2006 Adianti Solutions Ltd. (http://www.adianti.com.br)
- * @license    http://www.adianti.com.br/framework-license
- */
+
+require_once 'app/control/custom/MindMapUtils.php';
 
 class MindMapPlugin extends TPage
 {
-
     private $mindmap_path;
     private $mindmap_name;
     private $mindmap_content;
@@ -31,7 +22,7 @@ class MindMapPlugin extends TPage
 
         } else {
 
-            AdiantiCoreApplication::loadPage('MapList');
+            AdiantiCoreApplication::loadPage('PrivateMindMap');
         }
     }
 
@@ -42,9 +33,21 @@ class MindMapPlugin extends TPage
             $this->mindmap_path = isset($_GET['p'])  ? $_GET['p']  : NULL;
             $this->mindmap_name = isset($_GET['view']) ? $_GET['view'] : NULL;
             
-            if ($this->mindmap_path and $this->mindmap_name)
+            if ($this->mindmap_name)
             {
-                $root = $_SERVER['DOCUMENT_ROOT'].'/bizumapa/userdata';
+
+                $scope = TSession::getValue('scope');
+                $userid = TSession::getValue('userid');
+                $root = $_SERVER['DOCUMENT_ROOT'] . '/userdata/';
+
+                if ($scope == 'public') {
+                    $root = $root . 'public';
+                } elseif ($scope == 'private') {
+                    $root = $root . $userid;
+                } else {
+                    die('Não permitido');
+                }
+
                 $full_path = implode('/', [$root, $this->mindmap_path, $this->mindmap_name]);                
                 $this->mindmap_content = file_get_contents($full_path);
 

@@ -22,6 +22,9 @@ class AdiantiRouteTranslator
          $routes['class=TipoProdutoForm&method=delete']   = 'tipo-produto-delete';
          */
         
+        // $routes = array();
+        // $routes['class=PublicMindMap'] = 'public-mindmap';
+
         // automatic parse .htaccess
         $routes = self::parseHtAccess();
         
