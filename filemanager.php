@@ -1,10 +1,12 @@
 <?php
 
+/**
+ * PHP File Manager (2017-08-07)
+ * https://github.com/alexantr/filemanager
+ */
+
 require_once 'init.php';
 require_once 'app/control/custom/MindMapUtils.php';
-
-
-// $vbox = MindMapUtils::loadFrame();
 
 session_id($_COOKIE['PHPSESSID']);
 session_start();

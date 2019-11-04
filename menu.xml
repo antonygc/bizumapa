@@ -3,6 +3,10 @@
     <menuitem label='Mapas'>
         <icon>fa:file-text-o fa-fw</icon>
         <menu>
+              <menuitem label='Temas'>
+                  <icon>fa:cloud-upload fa-fw</icon>
+                  <action>CustomThemeList</action>
+              </menuitem>
               <menuitem label='Mapas Públicos'>
                   <icon>fa:cloud-upload fa-fw</icon>
                   <action>PublicMindMap</action>

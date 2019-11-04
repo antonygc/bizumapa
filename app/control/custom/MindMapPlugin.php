@@ -2,9 +2,6 @@
 
 class MindMapPlugin extends TPage
 {
-    private $mindmap_path;
-    private $mindmap_name;
-    private $mindmap_content;
 
     public function __construct()
     {
