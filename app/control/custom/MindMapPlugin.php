@@ -71,7 +71,21 @@ class MindMapPlugin extends TPage
 
     function includePluginHTML()
     {
+
+        $scope = TSession::getValue('scope');
         $kityMinder = new TElement('kityminder-editor');
+
+        if ($scope == 'public' & !MindMapUtils::isAdminUser()) {
+
+            $kityMinder = new TElement('kityminder-viewer');
+
+            // echo "<script>
+            //     editor.minder.disable();
+            //     editor.minder.execCommand('hand');
+            //     </script>";
+        }
+        
+
         $kityMinder->{'on-init'} = 'initEditor(editor, minder)';
         $kityMinder->{'data-theme'} = 'fresh-green';
 

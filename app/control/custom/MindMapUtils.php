@@ -42,4 +42,11 @@ class MindMapUtils
 
         return implode('/', [$root, $mappath, $mapname]);
 	}
+
+
+    public static function isAdminUser()
+    {
+        $usergroupis = TSession::getValue('usergroupids');
+        return in_array('1', $usergroupis);
+    }
 }
