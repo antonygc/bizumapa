@@ -14,65 +14,47 @@ class CustomPublicMindMapForm extends TPage
         $this->form->setFormTitle('Configurar Mapa Público');
 
         // create the form fields
-        $id   = new TEntry('id');
+        $id = new TEntry('id');
         $name = new TEntry('name');
-        $theme_id = new TDBSeekButton('theme_id', 'permission', 'form_CustomPublicMindMap', 'CustomTheme', 'name', 'theme_id', 'theme_name');
-        $theme_name = new TEntry('theme_name');
-        $theme_id->setSize('1');
-        // $theme_name->setSize('calc(100% - 200px)');
-        $theme_name->setEditable(FALSE);
+        $theme_id = new TDBCombo('theme_id', 'permission', 'CustomTheme', 'id', 'name', 'name');
+        $theme_id->enableSearch();
         
-        // define the sizes
+        // filter to avoid preload items
+        // $filter = new TCriteria;
+        // $filter->add(new TFilter('id', '<', '0'));
+        // // $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name', $filter);
+        $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name');
+        $subject_matter_id->enableSearch();
+
         $id->setSize('30%');
         $name->setSize('70%');
+        $theme_id->setSize('70%');
+        $subject_matter_id->setSize('70%');
 
-        // validations
-        $name->addValidation('Nome', new TRequiredValidator);
-        $theme_name->addValidation('theme_name', new TRequiredValidator);
-        
-        // outras propriedades
         $id->setEditable(false);
+        $name->addValidation('Nome', new TRequiredValidator);
+        $theme_id->setChangeAction( new TAction( array($this, 'onThemeChange' )) );
         
-        $hbox = new THBox;
-        $hbox->add($theme_name, 'display:initial');
-        $hbox->add($theme_id);
-
         $this->form->addFields( [new TLabel('ID')], [$id]);
         $this->form->addFields( [new TLabel(_t('Name'))], [$name]);
-        $this->form->addFields( [new TLabel('Matéria')], [$hbox]);
-        
-        $vbox = new TVBox;
-        $vbox->style='width:100%';
-        $vbox->add( $hbox );
-        // $vbox->add(TPanelGroup::pack('', $this->program_list));
-                
+        $this->form->addFields( [new TLabel('Matéria')], [$theme_id]);
+        $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id]);
+                        
         $btn = $this->form->addAction( _t('Save'), new TAction(array($this, 'onSave')), 'fa:floppy-o' );
         $btn->class = 'btn btn-sm btn-primary';
         
         $this->form->addAction( _t('Clear'), new TAction(array($this, 'onEdit')),  'fa:eraser red' );
         $this->form->addAction( _t('Back'), new TAction(array('CustomPublicMindMapList','onReload')),  'fa:arrow-circle-o-left blue' );
-        
-        $this->form->addField($theme_id);
-        $this->form->addField($theme_name);
-        
+
         $container = new TVBox;
-        $container->style = 'width:90%';
+        $container->style = 'width:100%';
         $container->add(new TXMLBreadCrumb('menu.xml', 'CustomPublicMindMapList'));
         $container->add($this->form);
         
         parent::add($container);
     }
 
-    /**
-     * Remove program from session
-     */
-    public static function deleteProgram($param)
-    {
-        $programs = TSession::getValue('program_list');
-        unset($programs[ $param['id'] ]);
-        TSession::setValue('program_list', $programs);
-    }
-    
+   
     /**
      * method onSave()
      * Executed whenever the user clicks at the save button
@@ -128,9 +110,6 @@ class CustomPublicMindMapForm extends TPage
                 
                 // instantiates object System_group
                 $object = new CustomPublicMindMap($key);
-
-                $object->theme_id = $object->theme->id;
-                $object->theme_name = $object->theme->name;
                 
                 // fill the form with the active record data
                 $this->form->setData($object);
@@ -155,56 +134,31 @@ class CustomPublicMindMapForm extends TPage
         }
     }
     
-    /**
-     * Add a program
-     */
-    public static function onAddProgram($param)
+
+public static function onThemeChange($param)
     {
         try
         {
-            $id = $param['program_id'];
-            $program_list = TSession::getValue('program_list');
-            
-            if (!empty($id) AND empty($program_list[$id]))
+            TTransaction::open('permission');
+            if (!empty($param['theme_id']))
             {
-                TTransaction::open('permission');
-                $program = SystemProgram::find($id);
-                $program_list[$id] = $program->toArray();
-                TSession::setValue('program_list', $program_list);
-                TTransaction::close();
+                $criteria = TCriteria::create( ['theme_id' => $param['theme_id'] ] );
                 
-                $i = new TElement('i');
-                $i->{'class'} = 'fa fa-trash red';
-                $btn = new TElement('a');
-                $btn->{'onclick'} = "__adianti_ajax_exec(\'class=SystemGroupForm&method=deleteProgram&id=$id\');$(this).closest(\'tr\').remove();";
-                $btn->{'class'} = 'btn btn-default btn-sm';
-                $btn->add($i);
-                
-                $tr = new TTableRow;
-                $tr->{'class'} = 'tdatagrid_row_odd';
-                $tr->{'style'} = 'width: 100%;display: inline-table;';
-                $cell = $tr->addCell( $btn );
-                $cell->{'style'}='text-align:center';
-                $cell->{'class'}='tdatagrid_cell';
-                $cell->{'width'} = '5%';
-                $cell = $tr->addCell( $program->id );
-                $cell->{'class'}='tdatagrid_cell';
-                $cell->{'width'} = '10%';
-                $cell = $tr->addCell( $program->name );
-                $cell->{'class'}='tdatagrid_cell';
-                $cell->{'width'} = '85%';
-                
-                TScript::create("tdatagrid_add_serialized_row('program_list', '$tr');");
-                
-                $data = new stdClass;
-                $data->program_id = '';
-                $data->program_name = '';
-                TForm::sendData('form_CustomPublicMindMap', $data);
+                // formname, field, database, model, key, value, ordercolumn = NULL, criteria = NULL, startEmpty = FALSE
+                TDBCombo::reloadFromModel('form_CustomPublicMindMap', 'subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', '{name}', 'name', $criteria, TRUE);
             }
+            else
+            {
+                TCombo::clearField('form_CustomPublicMindMap', 'subject_matter_id');
+            }
+            
+            TTransaction::close();
         }
         catch (Exception $e)
         {
             new TMessage('error', $e->getMessage());
         }
     }
+    
+   
 }

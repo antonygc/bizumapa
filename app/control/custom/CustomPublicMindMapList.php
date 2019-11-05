@@ -64,10 +64,10 @@ class CustomPublicMindMapList extends TStandardList
         $column_subject_matter_name = new TDataGridColumn('subject_matter->name', 'Assunto', 'left');
 
         // add the columns to the DataGrid
+        $this->datagrid->addColumn($column_id);
+        $this->datagrid->addColumn($column_name);
         $this->datagrid->addColumn($column_theme_name);
         $this->datagrid->addColumn($column_subject_matter_name);
-        $this->datagrid->addColumn($column_name);
-        $this->datagrid->addColumn($column_id);
 
 
         // creates the datagrid column actions
@@ -83,7 +83,6 @@ class CustomPublicMindMapList extends TStandardList
         // $order_theme_name->setParameter('order', 'theme_name');
         // $column_theme_name->setAction($order_theme_name);
 
-        
         // create EDIT action
         $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));
         $action_edit->setButtonClass('btn btn-default');
@@ -115,11 +114,37 @@ class CustomPublicMindMapList extends TStandardList
         
         // vertical box container
         $container = new TVBox;
-        $container->style = 'width: 90%';
+        $container->style = 'width: 100%';
         $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->form);
         $container->add($panel);
         
         parent::add($container);
     }
+
+    public static function onThemeChange($param)
+    {
+        try
+        {
+            TTransaction::open('permission');
+            if (!empty($param['theme_id']))
+            {
+                $criteria = TCriteria::create( ['theme_id' => $param['theme_id'] ] );
+                
+                // formname, field, database, model, key, value, ordercolumn = NULL, criteria = NULL, startEmpty = FALSE
+                TDBCombo::reloadFromModel('form_search_CustomPublicMindMap', 'subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', '{name}', 'name', $criteria, TRUE);
+            }
+            else
+            {
+                TCombo::clearField('form__search_CustomPublicMindMap', 'subject_matter_id');
+            }
+            
+            TTransaction::close();
+        }
+        catch (Exception $e)
+        {
+            new TMessage('error', $e->getMessage());
+        }
+    }
+
 }
