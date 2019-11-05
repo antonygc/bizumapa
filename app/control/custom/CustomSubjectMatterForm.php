@@ -128,9 +128,8 @@ class CustomSubjectMatterForm extends TPage
                 
                 // instantiates object System_group
                 $object = new CustomSubjectMatter($key);
-                $custom_theme = $object->getCustomTheme();
-                $object->custom_theme_id = $custom_theme['id'];
-                $object->custom_theme_name = $custom_theme['name'];
+                $object->custom_theme_id = $object->custom_theme->id;
+                $object->custom_theme_name = $object->custom_theme->name;
                 
                 // fill the form with the active record data
                 $this->form->setData($object);

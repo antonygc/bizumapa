@@ -6,9 +6,8 @@ class CustomSubjectMatter extends TRecord
     const PRIMARYKEY = 'id';
     const IDPOLICY   = 'max'; // {max, serial}
     
-    /**
-     * Constructor method
-     */
+    private $custom_theme;
+
     public function __construct($id = NULL)
     {
         parent::__construct($id);
@@ -16,14 +15,20 @@ class CustomSubjectMatter extends TRecord
         parent::addAttribute('custom_theme_id');
     }
 
-    public function getCustomTheme()
+    public function set_custom_theme(CustomTheme $object)
     {
-
-        $repository = new TRepository('CustomTheme');
-        $criteria = new TCriteria;
-        $criteria->add(new TFilter('id', '=', $this->custom_theme_id));
-
-        return $repository->load($criteria)[0]->data;
+        $this->custom_theme = $object;
+        $this->custom_theme_id = $object->id;
+    }
+    
+    public function get_custom_theme()
+    {
+        // loads the associated object
+        if (empty($this->custom_theme))
+            $this->custom_theme = new CustomTheme($this->custom_theme_id);
+    
+        // returns the associated object
+        return $this->custom_theme;
     }
 
     /**

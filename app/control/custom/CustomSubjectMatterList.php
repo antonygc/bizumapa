@@ -101,7 +101,7 @@ class CustomSubjectMatterList extends TStandardList
         
         // vertical box container
         $container = new TVBox;
-        $container->style = 'width: 90%';
+        $container->style = 'width: 100%';
         $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->form);
         $container->add($panel);
