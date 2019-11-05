@@ -6,29 +6,29 @@ class CustomSubjectMatter extends TRecord
     const PRIMARYKEY = 'id';
     const IDPOLICY   = 'max'; // {max, serial}
     
-    private $custom_theme;
+    private $theme;
 
     public function __construct($id = NULL)
     {
         parent::__construct($id);
         parent::addAttribute('name');
-        parent::addAttribute('custom_theme_id');
+        parent::addAttribute('theme_id');
     }
 
     public function set_custom_theme(CustomTheme $object)
     {
-        $this->custom_theme = $object;
-        $this->custom_theme_id = $object->id;
+        $this->theme = $object;
+        $this->theme_id = $object->id;
     }
     
     public function get_custom_theme()
     {
         // loads the associated object
-        if (empty($this->custom_theme))
-            $this->custom_theme = new CustomTheme($this->custom_theme_id);
+        if (empty($this->theme))
+            $this->theme = new CustomTheme($this->theme_id);
     
         // returns the associated object
-        return $this->custom_theme;
+        return $this->theme;
     }
 
     /**

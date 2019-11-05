@@ -16,11 +16,11 @@ class CustomSubjectMatterForm extends TPage
         // create the form fields
         $id   = new TEntry('id');
         $name = new TEntry('name');
-        $custom_theme_id = new TDBSeekButton('custom_theme_id', 'permission', 'form_CustomSubjectMatter', 'CustomTheme', 'name', 'custom_theme_id', 'custom_theme_name');
-        $custom_theme_name = new TEntry('custom_theme_name');
-        $custom_theme_id->setSize('1');
+        $theme_id = new TDBSeekButton('theme_id', 'permission', 'form_CustomSubjectMatter', 'CustomTheme', 'name', 'theme_id', 'theme_name');
+        $theme_name = new TEntry('theme_name');
+        $theme_id->setSize('1');
         // $theme_name->setSize('calc(100% - 200px)');
-        $custom_theme_name->setEditable(FALSE);
+        $theme_name->setEditable(FALSE);
         
         // define the sizes
         $id->setSize('30%');
@@ -28,14 +28,14 @@ class CustomSubjectMatterForm extends TPage
 
         // validations
         $name->addValidation('Nome', new TRequiredValidator);
-        $custom_theme_name->addValidation('custom_theme_name', new TRequiredValidator);
+        $theme_name->addValidation('theme_name', new TRequiredValidator);
         
         // outras propriedades
         $id->setEditable(false);
         
         $hbox = new THBox;
-        $hbox->add($custom_theme_name, 'display:initial');
-        $hbox->add($custom_theme_id);
+        $hbox->add($theme_name, 'display:initial');
+        $hbox->add($theme_id);
 
         $this->form->addFields( [new TLabel('ID')], [$id]);
         $this->form->addFields( [new TLabel(_t('Name'))], [$name]);
@@ -52,8 +52,8 @@ class CustomSubjectMatterForm extends TPage
         $this->form->addAction( _t('Clear'), new TAction(array($this, 'onEdit')),  'fa:eraser red' );
         $this->form->addAction( _t('Back'), new TAction(array('CustomSubjectMatterList','onReload')),  'fa:arrow-circle-o-left blue' );
         
-        $this->form->addField($custom_theme_id);
-        $this->form->addField($custom_theme_name);
+        $this->form->addField($theme_id);
+        $this->form->addField($theme_name);
         
         $container = new TVBox;
         $container->style = 'width:90%';
@@ -128,8 +128,8 @@ class CustomSubjectMatterForm extends TPage
                 
                 // instantiates object System_group
                 $object = new CustomSubjectMatter($key);
-                $object->custom_theme_id = $object->custom_theme->id;
-                $object->custom_theme_name = $object->custom_theme->name;
+                $object->theme_id = $object->custom_theme->id;
+                $object->theme_name = $object->custom_theme->name;
                 
                 // fill the form with the active record data
                 $this->form->setData($object);

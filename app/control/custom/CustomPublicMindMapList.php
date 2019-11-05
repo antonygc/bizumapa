@@ -27,12 +27,18 @@ class CustomPublicMindMapList extends TStandardList
         $this->form->setFormTitle('Buscar Mapa Mental');
         
         // create the form fields
-        $id = new TEntry('id');
-        $name = new TEntry('name');
+        $id                  = new TEntry('id');
+        $name                = new TEntry('name');
+        $theme_id            = new TEntry('theme_id');
+        $theme_name          = new TEntry('theme_name');
+        $subject_matter_id   = new TEntry('subject_matter_id');
+        $subject_matter_name = new TEntry('subject_matter_name');
         
         // add the fields
         $this->form->addFields( [new TLabel('ID')], [$id] );
         $this->form->addFields( [new TLabel('Nome')], [$name] );
+        $this->form->addFields( [new TLabel('Matéria')], [$theme_name] );
+        $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_name] );
 
         $id->setSize('30%');
         $name->setSize('70%');
@@ -43,7 +49,7 @@ class CustomPublicMindMapList extends TStandardList
         // add the search form actions
         $btn = $this->form->addAction(_t('Find'), new TAction(array($this, 'onSearch')), 'fa:search');
         $btn->class = 'btn btn-sm btn-primary';
-        $this->form->addAction('Nova Matéria',  new TAction(array('CustomPublicMindMapForm', 'onEdit')), 'bs:plus-sign green');
+        $this->form->addAction('Novo Mapa Público',  new TAction(array('CustomPublicMindMapForm', 'onEdit')), 'bs:plus-sign green');
         
         // creates a DataGrid
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
@@ -52,13 +58,16 @@ class CustomPublicMindMapList extends TStandardList
         $this->datagrid->setHeight(320);
         
         // creates the datagrid columns
-        $column_id = new TDataGridColumn('id', 'Id', 'center', 50);
-        $column_name = new TDataGridColumn('name', _t('Name'), 'left');
-
+        $column_id                  = new TDataGridColumn('id', 'ID', 'center', 50);
+        $column_name                = new TDataGridColumn('name', 'Mapa', 'left');
+        $column_theme_name          = new TDataGridColumn('theme->name', 'Matéria', 'left');
+        $column_subject_matter_name = new TDataGridColumn('subject_matter->name', 'Assunto', 'left');
 
         // add the columns to the DataGrid
-        $this->datagrid->addColumn($column_id);
+        $this->datagrid->addColumn($column_theme_name);
+        $this->datagrid->addColumn($column_subject_matter_name);
         $this->datagrid->addColumn($column_name);
+        $this->datagrid->addColumn($column_id);
 
 
         // creates the datagrid column actions
@@ -69,6 +78,11 @@ class CustomPublicMindMapList extends TStandardList
         $order_name = new TAction(array($this, 'onReload'));
         $order_name->setParameter('order', 'name');
         $column_name->setAction($order_name);
+
+        // $order_theme_name = new TAction(array($this, 'onReload'));
+        // $order_theme_name->setParameter('order', 'theme_name');
+        // $column_theme_name->setAction($order_theme_name);
+
         
         // create EDIT action
         $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));

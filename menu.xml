@@ -19,6 +19,10 @@
         <icon>fa:cloud-upload fa-fw</icon>
         <action>PrivateMindMap</action>
       </menuitem>
+      <menuitem label="Mapas Públicos">
+        <icon>fa:share-alt fa:fw</icon>
+        <action>CustomPublicMindMapList</action>
+      </menuitem>
     </menu>
   </menuitem>
   <menuitem label="_t{Administration}">
