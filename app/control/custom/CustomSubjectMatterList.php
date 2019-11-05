@@ -43,7 +43,7 @@ class CustomSubjectMatterList extends TStandardList
         // add the search form actions
         $btn = $this->form->addAction('Buscar', new TAction(array($this, 'onSearch')), 'fa:search');
         $btn->class = 'btn btn-sm btn-primary';
-        $this->form->addAction('Novo',  new TAction(array('CustomSubjectMatterForm', 'onEdit')), 'bs:plus-sign green');
+        $this->form->addAction('Novo Assunto',  new TAction(array('CustomSubjectMatterForm', 'onEdit')), 'bs:plus-sign green');
         
         // creates a DataGrid
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
