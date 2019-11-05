@@ -1,6 +1,6 @@
 <?php
 
-class CustomThemeList extends TStandardList
+class CustomSubjectMatterList extends TStandardList
 {
     protected $form;     // registration form
     protected $datagrid; // listing
@@ -17,33 +17,33 @@ class CustomThemeList extends TStandardList
         parent::__construct();
         
         parent::setDatabase('permission');            // defines the database
-        parent::setActiveRecord('CustomTheme');   // defines the active record
+        parent::setActiveRecord('CustomSubjectMatter');   // defines the active record
         parent::setDefaultOrder('id', 'asc');         // defines the default order
         parent::addFilterField('id', '=', 'id'); // filterField, operator, formField
         parent::addFilterField('name', 'like', 'name'); // filterField, operator, formField
         
         // creates the form
-        $this->form = new BootstrapFormBuilder('form_search_CustomTheme');
-        $this->form->setFormTitle('Buscar Matéria');
+        $this->form = new BootstrapFormBuilder('form_search_CustomSubjectMatter');
+        $this->form->setFormTitle('Buscar Assunto');
         
         // create the form fields
         $id = new TEntry('id');
         $name = new TEntry('name');
         
         // add the fields
-        $this->form->addFields( [new TLabel('Id')], [$id] );
+        $this->form->addFields( [new TLabel('ID')], [$id] );
         $this->form->addFields( [new TLabel('Nome')], [$name] );
 
         $id->setSize('30%');
         $name->setSize('70%');
         
         // keep the form filled during navigation with session data
-        $this->form->setData( TSession::getValue('CustomTheme_filter_data') );
+        $this->form->setData( TSession::getValue('CustomSubjectMatter_filter_data') );
         
         // add the search form actions
-        $btn = $this->form->addAction(_t('Find'), new TAction(array($this, 'onSearch')), 'fa:search');
+        $btn = $this->form->addAction('Buscar', new TAction(array($this, 'onSearch')), 'fa:search');
         $btn->class = 'btn btn-sm btn-primary';
-        $this->form->addAction(_t('New'),  new TAction(array('CustomThemeForm', 'onEdit')), 'bs:plus-sign green');
+        $this->form->addAction('Novo',  new TAction(array('CustomSubjectMatterForm', 'onEdit')), 'bs:plus-sign green');
         
         // creates a DataGrid
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
@@ -53,7 +53,7 @@ class CustomThemeList extends TStandardList
         
         // creates the datagrid columns
         $column_id = new TDataGridColumn('id', 'Id', 'center', 50);
-        $column_name = new TDataGridColumn('name', _t('Name'), 'left');
+        $column_name = new TDataGridColumn('name', 'Nome', 'left');
 
 
         // add the columns to the DataGrid
@@ -71,7 +71,7 @@ class CustomThemeList extends TStandardList
         $column_name->setAction($order_name);
         
         // create EDIT action
-        $action_edit = new TDataGridAction(array('CustomThemeForm', 'onEdit'));
+        $action_edit = new TDataGridAction(array('CustomSubjectMatterForm', 'onEdit'));
         $action_edit->setButtonClass('btn btn-default');
         $action_edit->setLabel(_t('Edit'));
         $action_edit->setImage('fa:pencil-square-o blue fa-lg');

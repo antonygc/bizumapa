@@ -1,83 +1,65 @@
 <?php
 
-class CustomThemeForm extends TPage
+class CustomSubjectMatterForm extends TPage
 {
     protected $form;
-    protected $program_list;
+    // protected $program_list;
     
     function __construct()
     {
         parent::__construct();
         
         // creates the form
-        $this->form = new BootstrapFormBuilder('form_CustomTheme');
-        $this->form->setFormTitle('Nova Matéria');
+        $this->form = new BootstrapFormBuilder('form_CustomSubjectMatter');
+        $this->form->setFormTitle('Novo Assunto');
 
         // create the form fields
         $id   = new TEntry('id');
         $name = new TEntry('name');
-        // $program_id = new TDBSeekButton('program_id', 'permission', 'form_CustomTheme', 'SystemProgram', 'name', 'program_id', 'program_name');
-        // $program_name = new TEntry('program_name');
-        // $program_id->setSize('50');
-        // $program_name->setSize('calc(100% - 200px)');
-        // $program_name->setEditable(FALSE);
+        $custom_theme_id = new TDBSeekButton('custom_theme_id', 'permission', 'form_CustomSubjectMatter', 'CustomTheme', 'name', 'custom_theme_id', 'custom_theme_name');
+        $custom_theme_name = new TEntry('custom_theme_name');
+        $custom_theme_id->setSize('1');
+        // $theme_name->setSize('calc(100% - 200px)');
+        $custom_theme_name->setEditable(FALSE);
         
         // define the sizes
         $id->setSize('30%');
         $name->setSize('70%');
 
         // validations
-        $name->addValidation('name', new TRequiredValidator);
+        $name->addValidation('Nome', new TRequiredValidator);
+        $custom_theme_name->addValidation('custom_theme_name', new TRequiredValidator);
         
         // outras propriedades
         $id->setEditable(false);
         
+        $hbox = new THBox;
+        $hbox->add($custom_theme_name, 'display:initial');
+        $hbox->add($custom_theme_id);
+
         $this->form->addFields( [new TLabel('ID')], [$id]);
         $this->form->addFields( [new TLabel(_t('Name'))], [$name]);
+        $this->form->addFields( [new TLabel('Matéria')], [$hbox]);
         
-        // $this->program_list = new BootstrapDatagridWrapper(new TQuickGrid);
-        // $this->program_list->setHeight(200);
-        // $this->program_list->makeScrollable();
-        // $this->program_list->style='width: 100%';
-        // $this->program_list->id = 'program_list';
-        // $this->program_list->disableDefaultClick();
-        // $this->program_list->addQuickColumn('', 'delete', 'center', '5%');
-        // $this->program_list->addQuickColumn('Id', 'id', 'left', '10%');
-        // $this->program_list->addQuickColumn(_t('Program'), 'name', 'left', '85%');
-        // $this->program_list->createModel();
-        
-        // $add_button  = TButton::create('add',  array($this,'onAddProgram'), _t('Add'), 'fa:plus green');
-        
-        // $hbox = new THBox;
-        // $hbox->add($program_id);
-        // $hbox->add($program_name, 'display:initial');
-        // $hbox->add($add_button);
-        // $hbox->style = 'margin: 4px';
-        
-        // $vbox = new TVBox;
-        // $vbox->style='width:100%';
-        // $vbox->add( $hbox );
+        $vbox = new TVBox;
+        $vbox->style='width:100%';
+        $vbox->add( $hbox );
         // $vbox->add(TPanelGroup::pack('', $this->program_list));
-        
-        // $this->form->addFields( [new TFormSeparator(_t('Programs'))] );
-        // $this->form->addFields( [$vbox] );
-        
+                
         $btn = $this->form->addAction( _t('Save'), new TAction(array($this, 'onSave')), 'fa:floppy-o' );
         $btn->class = 'btn btn-sm btn-primary';
         
         $this->form->addAction( _t('Clear'), new TAction(array($this, 'onEdit')),  'fa:eraser red' );
-        $this->form->addAction( _t('Back'), new TAction(array('CustomThemeList','onReload')),  'fa:arrow-circle-o-left blue' );
+        $this->form->addAction( _t('Back'), new TAction(array('CustomSubjectMatterList','onReload')),  'fa:arrow-circle-o-left blue' );
         
-        // $this->form->addField($program_id);
-        // $this->form->addField($program_name);
-        // $this->form->addField($add_button);
+        $this->form->addField($custom_theme_id);
+        $this->form->addField($custom_theme_name);
         
         $container = new TVBox;
         $container->style = 'width:90%';
-        $container->add(new TXMLBreadCrumb('menu.xml', 'CustomThemeList'));
+        $container->add(new TXMLBreadCrumb('menu.xml', 'CustomSubjectMatterList'));
         $container->add($this->form);
         
-        // add the form to the page
         parent::add($container);
     }
 
@@ -99,27 +81,22 @@ class CustomThemeForm extends TPage
     {
         try
         {
+
+            // $param['custom_theme_id'] = $param['theme_id'];
+            // $param['custom_theme_name'] = $param['theme_name'];
+
             // open a transaction with database 'permission'
             TTransaction::open('permission');
             
             // get the form data into an active record System_group
-            $object = new CustomTheme;
+            $object = new CustomSubjectMatter;
             $object->fromArray( $param );
             $object->store();
             // $object->clearParts();
             
-            // $programs = TSession::getValue('program_list');
-            // if (!empty($programs))
-            // {
-            //     foreach ($programs as $program)
-            //     {
-            //         $object->addSystemProgram( new SystemProgram( $program['id'] ) );
-            //     }
-            // }
-            
             $data = new stdClass;
             $data->id = $object->id;
-            TForm::sendData('form_CustomTheme', $data);
+            TForm::sendData('form_CustomSubjectMatter', $data);
             
             TTransaction::close(); // close the transaction
             new TMessage('info', _t('Record saved')); // shows the success message
@@ -151,28 +128,10 @@ class CustomThemeForm extends TPage
                 TTransaction::open('permission');
                 
                 // instantiates object System_group
-                $object = new CustomTheme($key);
-                
-                // $data = array();
-                // foreach ($object->getSystemPrograms() as $program)
-                // {
-                //     $data[$program->id] = $program->toArray();
-                    
-                //     $item = new stdClass;
-                //     $item->id = $program->id;
-                //     $item->name = $program->name;
-                    
-                //     $i = new TElement('i');
-                //     $i->{'class'} = 'fa fa-trash red';
-                //     $btn = new TElement('a');
-                //     $btn->{'onclick'} = "__adianti_ajax_exec('class=SystemGroupForm&method=deleteProgram&id={$program->id}');$(this).closest('tr').remove();";
-                //     $btn->{'class'} = 'btn btn-default btn-sm';
-                //     $btn->add( $i );
-                    
-                //     $item->delete = $btn;
-                //     $tr = $this->program_list->addItem($item);
-                //     $tr->{'style'} = 'width: 100%;display: inline-table;';
-                // }
+                $object = new CustomSubjectMatter($key);
+                $custom_theme = $object->getCustomTheme();
+                $object->custom_theme_id = $custom_theme['id'];
+                $object->custom_theme_name = $custom_theme['name'];
                 
                 // fill the form with the active record data
                 $this->form->setData($object);
@@ -180,7 +139,6 @@ class CustomThemeForm extends TPage
                 // close the transaction
                 TTransaction::close();
                 
-                // TSession::setValue('program_list', $data);
             }
             else
             {
@@ -242,7 +200,7 @@ class CustomThemeForm extends TPage
                 $data = new stdClass;
                 $data->program_id = '';
                 $data->program_name = '';
-                TForm::sendData('form_CustomTheme', $data);
+                TForm::sendData('form_CustomSubjectMatter', $data);
             }
         }
         catch (Exception $e)
