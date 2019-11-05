@@ -21,27 +21,33 @@ class CustomPublicMindMapList extends TStandardList
         parent::setDefaultOrder('id', 'asc');         // defines the default order
         parent::addFilterField('id', '=', 'id'); // filterField, operator, formField
         parent::addFilterField('name', 'like', 'name'); // filterField, operator, formField
+        parent::addFilterField('theme_id', '=', 'theme_id'); // filterField, operator, formField
+        parent::addFilterField('subject_matter_id', '=', 'subject_matter_id'); // filterField, operator, formField
         
         // creates the form
         $this->form = new BootstrapFormBuilder('form_search_CustomPublicMindMap');
         $this->form->setFormTitle('Buscar Mapa Mental');
         
         // create the form fields
-        $id                  = new TEntry('id');
-        $name                = new TEntry('name');
-        $theme_id            = new TEntry('theme_id');
-        $theme_name          = new TEntry('theme_name');
-        $subject_matter_id   = new TEntry('subject_matter_id');
-        $subject_matter_name = new TEntry('subject_matter_name');
+        $id = new TEntry('id');
+        $name = new TEntry('name');
+        $theme_id = new TDBCombo('theme_id', 'permission', 'CustomTheme', 'id', 'name', 'name');
+        $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name');
         
         // add the fields
         $this->form->addFields( [new TLabel('ID')], [$id] );
         $this->form->addFields( [new TLabel('Nome')], [$name] );
-        $this->form->addFields( [new TLabel('Matéria')], [$theme_name] );
-        $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_name] );
+        $this->form->addFields( [new TLabel('Matéria')], [$theme_id] );
+        $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id] );
 
         $id->setSize('30%');
         $name->setSize('70%');
+        $theme_id->setSize('70%');
+        $subject_matter_id->setSize('70%');
+
+        $theme_id->enableSearch();
+        $theme_id->setChangeAction( new TAction( array($this, 'onThemeChange' )) );
+        $subject_matter_id->enableSearch();
         
         // keep the form filled during navigation with session data
         $this->form->setData( TSession::getValue('CustomPublicMindMap_filter_data') );
@@ -78,10 +84,6 @@ class CustomPublicMindMapList extends TStandardList
         $order_name = new TAction(array($this, 'onReload'));
         $order_name->setParameter('order', 'name');
         $column_name->setAction($order_name);
-
-        // $order_theme_name = new TAction(array($this, 'onReload'));
-        // $order_theme_name->setParameter('order', 'theme_name');
-        // $column_theme_name->setAction($order_theme_name);
 
         // create EDIT action
         $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));
