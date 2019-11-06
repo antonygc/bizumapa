@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu>
-  <menuitem label="Mapas">
+
+  <menuitem label="Mapas Públicos">
+    <icon>fa:globe fa:fw</icon>
+    <action>CustomPublicMindMapList</action>
+  </menuitem>
+  <menuitem label="Meus Mapas">
+    <icon>fa:share-alt-square fa:fw</icon>
+    <action>CustomPrivateMindMapList</action>
+  </menuitem>
+
+  <menuitem label="Classificação">
     <icon>fa:file-text-o fa-fw</icon>
     <menu>
       <menuitem label="Matérias">
@@ -11,6 +21,12 @@
         <icon>fa:list fa:fw</icon>
         <action>CustomSubjectMatterList</action>
       </menuitem>
+    </menu>
+  </menuitem>
+
+  <menuitem label="Mapas">
+    <icon>fa:file-text-o fa-fw</icon>
+    <menu>
       <menuitem label="Mapas Públicos">
         <icon>fa:cloud-upload fa-fw</icon>
         <action>PublicMindMap</action>
@@ -18,10 +34,6 @@
       <menuitem label="Meus Mapas">
         <icon>fa:cloud-upload fa-fw</icon>
         <action>PrivateMindMap</action>
-      </menuitem>
-      <menuitem label="Mapas Públicos">
-        <icon>fa:share-alt fa:fw</icon>
-        <action>CustomPublicMindMapList</action>
       </menuitem>
     </menu>
   </menuitem>

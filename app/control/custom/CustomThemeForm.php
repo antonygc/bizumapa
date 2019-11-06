@@ -123,6 +123,8 @@ class CustomThemeForm extends TPage
             
             TTransaction::close(); // close the transaction
             new TMessage('info', _t('Record saved')); // shows the success message
+            AdiantiCoreApplication::loadPage('CustomThemeList');
+
         }
         catch (Exception $e) // in case of exception
         {

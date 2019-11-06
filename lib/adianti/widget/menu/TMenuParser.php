@@ -54,6 +54,12 @@ class TMenuParser
                     $label = _t(substr($label,3,-1), 3, -1);
                 }
                 $this->parse($xmlElement-> menu-> menuitem, array($label));
+
+                // Adicionado para reconhecer ações nos itens na raiz do XML
+                if ($action)
+                {
+                    $this->paths[$action] = array_merge(array($label));
+                }
             }
         }
         else

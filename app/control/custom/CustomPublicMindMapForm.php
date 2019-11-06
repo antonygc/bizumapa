@@ -16,8 +16,10 @@ class CustomPublicMindMapForm extends TPage
         // create the form fields
         $id = new TEntry('id');
         $name = new TEntry('name');
+        $filter = new TCriteria;
+        $filter->add(new TFilter('id', '<', '0'));
         $theme_id = new TDBCombo('theme_id', 'permission', 'CustomTheme', 'id', 'name', 'name');
-        $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name');
+        $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name', $filter);
         
         $id->setSize('30%');
         $name->setSize('70%');
@@ -31,7 +33,7 @@ class CustomPublicMindMapForm extends TPage
         $theme_id->enableSearch();
         
         $this->form->addFields( [new TLabel('ID')], [$id]);
-        $this->form->addFields( [new TLabel(_t('Name'))], [$name]);
+        $this->form->addFields( [new TLabel('Mapa')], [$name]);
         $this->form->addFields( [new TLabel('Matéria')], [$theme_id]);
         $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id]);
                         

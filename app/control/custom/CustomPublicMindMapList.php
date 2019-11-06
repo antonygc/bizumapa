@@ -15,14 +15,34 @@ class CustomPublicMindMapList extends TStandardList
     public function __construct()
     {
         parent::__construct();
+
+        $this->createSearchForm();
+        $this->createDatagrid();
         
-        parent::setDatabase('permission');            // defines the database
-        parent::setActiveRecord('CustomPublicMindMap');   // defines the active record
-        parent::setDefaultOrder('id', 'asc');         // defines the default order
-        parent::addFilterField('id', '=', 'id'); // filterField, operator, formField
-        parent::addFilterField('name', 'like', 'name'); // filterField, operator, formField
-        parent::addFilterField('theme_id', '=', 'theme_id'); // filterField, operator, formField
-        parent::addFilterField('subject_matter_id', '=', 'subject_matter_id'); // filterField, operator, formField
+        $panel = new TPanelGroup;
+        $panel->add($this->datagrid);
+        $panel->addFooter($this->pageNavigation);
+        
+        // vertical box container
+        $container = new TVBox;
+        $container->style = 'width: 100%';
+        $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
+        $container->add($this->form);
+        $container->add($panel);
+        
+        parent::add($container);
+    }
+
+
+    public function createSearchForm()
+    {
+        parent::setDatabase('permission');            
+        parent::setActiveRecord('CustomPublicMindMap');   
+        parent::setDefaultOrder('id', 'asc');         
+        parent::addFilterField('id', '=', 'id'); 
+        parent::addFilterField('name', 'like', 'name'); 
+        parent::addFilterField('theme_id', '=', 'theme_id'); 
+        parent::addFilterField('subject_matter_id', '=', 'subject_matter_id');
         
         // creates the form
         $this->form = new BootstrapFormBuilder('form_search_CustomPublicMindMap');
@@ -31,12 +51,14 @@ class CustomPublicMindMapList extends TStandardList
         // create the form fields
         $id = new TEntry('id');
         $name = new TEntry('name');
+        $filter = new TCriteria;
+        $filter->add(new TFilter('id', '<', '0'));
         $theme_id = new TDBCombo('theme_id', 'permission', 'CustomTheme', 'id', 'name', 'name');
-        $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name');
+        $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name', $filter);
         
         // add the fields
         $this->form->addFields( [new TLabel('ID')], [$id] );
-        $this->form->addFields( [new TLabel('Nome')], [$name] );
+        $this->form->addFields( [new TLabel('Mapa')], [$name] );
         $this->form->addFields( [new TLabel('Matéria')], [$theme_id] );
         $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id] );
 
@@ -56,7 +78,11 @@ class CustomPublicMindMapList extends TStandardList
         $btn = $this->form->addAction(_t('Find'), new TAction(array($this, 'onSearch')), 'fa:search');
         $btn->class = 'btn btn-sm btn-primary';
         $this->form->addAction('Novo Mapa Público',  new TAction(array('CustomPublicMindMapForm', 'onEdit')), 'bs:plus-sign green');
-        
+    }
+
+
+    public function createDatagrid()
+    {
         // creates a DataGrid
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
         $this->datagrid->datatable = 'true';
@@ -75,7 +101,6 @@ class CustomPublicMindMapList extends TStandardList
         $this->datagrid->addColumn($column_theme_name);
         $this->datagrid->addColumn($column_subject_matter_name);
 
-
         // creates the datagrid column actions
         $order_id = new TAction(array($this, 'onReload'));
         $order_id->setParameter('order', 'id');
@@ -85,21 +110,7 @@ class CustomPublicMindMapList extends TStandardList
         $order_name->setParameter('order', 'name');
         $column_name->setAction($order_name);
 
-        // create EDIT action
-        $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));
-        $action_edit->setButtonClass('btn btn-default');
-        $action_edit->setLabel(_t('Edit'));
-        $action_edit->setImage('fa:pencil-square-o blue fa-lg');
-        $action_edit->setField('id');
-        $this->datagrid->addAction($action_edit);
-        
-        // create DELETE action
-        $action_del = new TDataGridAction(array($this, 'onDelete'));
-        $action_del->setButtonClass('btn btn-default');
-        $action_del->setLabel(_t('Delete'));
-        $action_del->setImage('fa:trash-o red fa-lg');
-        $action_del->setField('id');
-        $this->datagrid->addAction($action_del);
+        $this->createActions();
         
         // create the datagrid model
         $this->datagrid->createModel();
@@ -109,19 +120,36 @@ class CustomPublicMindMapList extends TStandardList
         $this->pageNavigation->enableCounters();
         $this->pageNavigation->setAction(new TAction(array($this, 'onReload')));
         $this->pageNavigation->setWidth($this->datagrid->getWidth());
+    }
+
+    public function createActions()
+    {
+
+        if (in_array('1', TSession::getValue('usergroupids'))) {
+            // user is admin
+            $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));
+            $action_edit->setButtonClass('btn btn-default');
+            $action_edit->setLabel(_t('Edit'));
+            $action_edit->setImage('fa:pencil-square-o blue fa-lg');
+            $action_edit->setField('id');
+            $this->datagrid->addAction($action_edit);
         
-        $panel = new TPanelGroup;
-        $panel->add($this->datagrid);
-        $panel->addFooter($this->pageNavigation);
-        
-        // vertical box container
-        $container = new TVBox;
-        $container->style = 'width: 100%';
-        $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
-        $container->add($this->form);
-        $container->add($panel);
-        
-        parent::add($container);
+            // create DELETE action
+            $action_del = new TDataGridAction(array($this, 'onDelete'));
+            $action_del->setButtonClass('btn btn-default');
+            $action_del->setLabel(_t('Delete'));
+            $action_del->setImage('fa:trash-o red fa-lg');
+            $action_del->setField('id');
+            $this->datagrid->addAction($action_del);
+        } else {
+
+            $action_copy = new TDataGridAction(array('CustomPublicMindMapList', 'onCopy'));
+            $action_copy->setButtonClass('btn btn-default');
+            $action_copy->setLabel('Copiar Mapa');
+            $action_copy->setImage('fa:copy blue fa-lg');
+            $action_copy->setField('id');
+            $this->datagrid->addAction($action_copy);
+        }
     }
 
     public static function onThemeChange($param)
@@ -147,6 +175,36 @@ class CustomPublicMindMapList extends TStandardList
         {
             new TMessage('error', $e->getMessage());
         }
+    }    
+
+
+    public function onCopy($params)
+    {
+        $form = new TQuickForm('input_form');
+        $form->style = 'padding:15px';
+
+        $filter = new TCriteria;
+        $filter->add(new TFilter('user_id', '=', TSession::getValue('userid')));
+        $folder_id = new TDBCombo('folder_id', 'permission', 'CustomFolder', 'id', 'name', 'name', $filter);
+        $folder_id->enableSearch();
+
+        $form->addQuickField('Nome', $folder_id);        
+        $folder_id->addValidation('folder_id', new TRequiredValidator);
+        $form->addQuickAction('Salvar', new TAction(array($this, 'onConfirm')), 'fa:save green');
+        
+        // show the input dialog
+        new TInputDialog('Copiar para Pasta', $form);
+    }
+
+
+
+    public function onConfirm($param)
+    {
+        if (!$param['folder_id']) {
+            return;
+        }
+
+
     }
 
 }
