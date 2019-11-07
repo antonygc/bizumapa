@@ -25,14 +25,13 @@ class CustomPublicMindMapList extends TStandardList
         
         // vertical box container
         $container = new TVBox;
-        $container->style = 'width: 100%';
+        $container->style = 'width: 80%';
         $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->form);
         $container->add($panel);
         
         parent::add($container);
     }
-
 
     public function createSearchForm()
     {
@@ -57,7 +56,7 @@ class CustomPublicMindMapList extends TStandardList
         $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name', $filter);
         
         // add the fields
-        $this->form->addFields( [new TLabel('ID')], [$id] );
+        // $this->form->addFields( [new TLabel('ID')], [$id] );
         $this->form->addFields( [new TLabel('Mapa')], [$name] );
         $this->form->addFields( [new TLabel('Matéria')], [$theme_id] );
         $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id] );
@@ -77,7 +76,10 @@ class CustomPublicMindMapList extends TStandardList
         // add the search form actions
         $btn = $this->form->addAction(_t('Find'), new TAction(array($this, 'onSearch')), 'fa:search');
         $btn->class = 'btn btn-sm btn-primary';
+
+        if (in_array('1', TSession::getValue('usergroupids'))) {
         $this->form->addAction('Novo Mapa Público',  new TAction(array('CustomPublicMindMapForm', 'onEdit')), 'bs:plus-sign green');
+        }
     }
 
 
@@ -145,9 +147,10 @@ class CustomPublicMindMapList extends TStandardList
 
             $action_copy = new TDataGridAction(array('CustomPublicMindMapList', 'onCopy'));
             $action_copy->setButtonClass('btn btn-default');
-            $action_copy->setLabel('Copiar Mapa');
+            $action_copy->setLabel('Copiar para Meus Mapas');
             $action_copy->setImage('fa:copy blue fa-lg');
             $action_copy->setField('id');
+            $action_copy->setField('name');
             $this->datagrid->addAction($action_copy);
         }
     }
@@ -180,30 +183,60 @@ class CustomPublicMindMapList extends TStandardList
 
     public function onCopy($params)
     {
+        // echo var_dump($params);
+        if (empty($params['id']) or empty($params['name'])) {
+            new TMessage('error', 'Parâmetros inválidos');
+            return;
+        }
+
         $form = new TQuickForm('input_form');
-        $form->style = 'padding:15px';
+        $form->style = 'padding:20px';
+
+        $name = new TEntry('name');
+        $name->setValue($params['name']);
 
         $filter = new TCriteria;
         $filter->add(new TFilter('user_id', '=', TSession::getValue('userid')));
         $folder_id = new TDBCombo('folder_id', 'permission', 'CustomFolder', 'id', 'name', 'name', $filter);
         $folder_id->enableSearch();
 
-        $form->addQuickField('Nome', $folder_id);        
+        $form->addQuickField('Nome:', $name);        
+        $form->addQuickField('Pasta de Destino:', $folder_id);        
         $folder_id->addValidation('folder_id', new TRequiredValidator);
-        $form->addQuickAction('Salvar', new TAction(array($this, 'onConfirm')), 'fa:save green');
+        $action = new TAction([$this, 'onConfirm'], ['id'=>$params['id']]);
+        $form->addQuickAction('Salvar', $action, 'fa:save green');
         
         // show the input dialog
-        new TInputDialog('Copiar para Pasta', $form);
+        new TInputDialog('Copiar para Meus Mapas', $form);
     }
 
-
-
-    public function onConfirm($param)
+    public function onConfirm($params)
     {
-        if (!$param['folder_id']) {
-            return;
-        }
+        // echo var_dump($params);
 
+        if (empty($params['folder_id']) or empty($params['id'])) {
+            new TMessage('error', 'Por favor preencha todos os campos');
+            return;
+        }        
+
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
+
+            $folder = new CustomPrivateMindMap; 
+            $folder->name = $params['name']; 
+            $folder->content = null; 
+            $folder->user_id = TSession::getValue('userid');
+            $folder->folder_id = $params['folder_id']; ;
+            $folder->store();
+            
+            new TMessage('info', 'Mapa copiado com sucesso'); 
+            TTransaction::close(); // Closes the transaction 
+        } 
+        catch (Exception $e) 
+        { 
+            new TMessage('error', $e->getMessage()); 
+        }
 
     }
 

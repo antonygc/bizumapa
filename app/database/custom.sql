@@ -63,3 +63,17 @@ INSERT INTO custom_folder VALUES(1,'__ROOT__',1,1);
 	-- DROP TABLE custom_folder;
 	-- DROP TABLE custom_private_mind_map;
 
+-- CREATE VIEW view_folder_private_map AS
+-- SELECT f.id, f.name, f.parent_id, f.user_id,
+-- 	   pmm.id, pmm.name, pmm.user_id, pmm.folder_id
+-- FROM custom_folder f
+-- LEFT JOIN custom_private_mind_map pmm ON f.id = pmm.folder_id
+-- WHERE f.user_id = 2;
+
+CREATE VIEW view_folder_contents AS
+SELECT f.id f_id, f.name f_name, f.parent_id f_parent_id, f.user_id f_user_id,
+	   pmm.id pmm_id, pmm.name pmm_name, pmm.user_id pmm_user_id, pmm.folder_id pmm_folder_id
+FROM custom_folder f
+LEFT JOIN custom_private_mind_map pmm ON f.id = pmm.folder_id;
+-- WHERE f.user_id = 2;
+
