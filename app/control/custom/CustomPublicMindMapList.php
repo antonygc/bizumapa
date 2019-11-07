@@ -57,7 +57,7 @@ class CustomPublicMindMapList extends TStandardList
         
         // add the fields
         // $this->form->addFields( [new TLabel('ID')], [$id] );
-        $this->form->addFields( [new TLabel('Mapa')], [$name] );
+        $this->form->addFields( [new TLabel('Mapa Mental')], [$name] );
         $this->form->addFields( [new TLabel('Matéria')], [$theme_id] );
         $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id] );
 
@@ -92,13 +92,17 @@ class CustomPublicMindMapList extends TStandardList
         $this->datagrid->setHeight(320);
         
         // creates the datagrid columns
-        $column_id                  = new TDataGridColumn('id', 'ID', 'center', 50);
-        $column_name                = new TDataGridColumn('name', 'Mapa', 'left');
+        $column_id                  = new TDataGridColumn('id', 'ID', 'center');
+        $column_name                = new TDataGridColumn('name', 'Mapa Mental', 'left', '30%');
         $column_theme_name          = new TDataGridColumn('theme->name', 'Matéria', 'left');
         $column_subject_matter_name = new TDataGridColumn('subject_matter->name', 'Assunto', 'left');
 
         // add the columns to the DataGrid
-        $this->datagrid->addColumn($column_id);
+
+        if (in_array('1', TSession::getValue('usergroupids'))) {
+            $this->datagrid->addColumn($column_id);
+        }
+
         $this->datagrid->addColumn($column_name);
         $this->datagrid->addColumn($column_theme_name);
         $this->datagrid->addColumn($column_subject_matter_name);
@@ -214,10 +218,17 @@ class CustomPublicMindMapList extends TStandardList
     {
         // echo var_dump($params);
 
-        if (empty($params['folder_id']) or empty($params['id'])) {
-            new TMessage('error', 'Por favor preencha todos os campos');
+        if (empty($params['id'])) {
+            new TMessage('error', 'Parâmetros incorretos');
             return;
         }        
+
+        if (empty($params['folder_id'])) {
+            $params['folder_id'] = '1'; // ROOT
+        }
+
+
+        // TODO: RECUPERAR CONTEÚDO DO MAPA COM $params['id']
 
         try 
         { 

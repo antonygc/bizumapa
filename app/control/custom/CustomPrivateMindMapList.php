@@ -25,6 +25,12 @@ class CustomPrivateMindMapList extends TStandardList
         $container->add($this->panel);
         
         parent::add($container);
+
+        if (!TSession::getValue('current_folder_id')) {
+            TSession::setValue('current_folder_name', 'Minhas Pastas');        
+            TSession::setValue('current_folder_id', '1');        
+        }
+
     }
 
     public function createDatagrid()
@@ -32,11 +38,13 @@ class CustomPrivateMindMapList extends TStandardList
         parent::setDatabase('permission');            // defines the database
         parent::setActiveRecord('ViewFolderContents');   // defines the active record
         parent::setDefaultOrder('item_name', 'asc');         // defines the default order
+        // parent::setDefaultOrder('item_type', 'desc');         // defines the default order
 
         $criteria = new TCriteria;
         $user_id = TSession::getValue('userid');
         $criteria->add(new TFilter('user_id', '=', $user_id));
-        $criteria->add(new TFilter('folder_id', '=', '1'));
+        $criteria->add(new TFilter('folder_id', '=', TSession::getValue('current_folder_id')));
+
         parent::setCriteria($criteria);
 
         // parent::addFilterField('id', '=', 'id'); // filterField, operator, formField
@@ -52,12 +60,12 @@ class CustomPrivateMindMapList extends TStandardList
         
         // creates the datagrid columns
         // $column_id                  = new TDataGridColumn('id', 'ID', 'center', 50);
-        $col_item_name = new TDataGridColumn('item_name', 'Item', 'left');
+        $col_item_name = new TDataGridColumn('item_name', 'Item', 'left', '');
         $col_item_type = new TDataGridColumn('item_type', 'Tipo', 'left');
 
         // add the columns to the DataGrid
         $this->datagrid->addColumn($col_item_name);
-        $this->datagrid->addColumn($col_item_type);
+        // $this->datagrid->addColumn($col_item_type);
 
         // creates the datagrid column actions
         $order_item_name = new TAction(array($this, 'onReload'));
@@ -81,6 +89,21 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function createActions()
     {
+        $action1 = new TDataGridAction(array($this, 'onViewFolder'));
+        $action1->setLabel('Ver Pasta');
+        $action1->setImage('fa:folder-open-o');
+        $action1->setField('item_id');
+        $action1->setField('item_name');
+        $action1->setDisplayCondition( array($this, 'isFolder') );
+        $this->datagrid->addAction($action1);
+
+        $action2 = new TDataGridAction(array($this, 'onViewMindMap'));
+        $action2->setLabel('Ver Mapa Mental');
+        $action2->setImage('fa:sitemap fa-rotate-27');
+        $action2->setField('item_id');
+        $action2->setDisplayCondition( array($this, 'isMindMap') );        
+        $this->datagrid->addAction($action2);
+
         // create EDIT action
         $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));
         $action_edit->setButtonClass('btn btn-default');
@@ -98,42 +121,70 @@ class CustomPrivateMindMapList extends TStandardList
         $this->datagrid->addAction($action_del);                
     }
 
-    public function createPanel($value='')
+    public function createPanel()
     {
         $this->panel = new BootstrapFormBuilder;
-        $this->panel->setFormTitle('Minhas Pastas');
-        $this->panel->addHeaderAction('Send', new TAction(array($this, 'onCreateFolder')), 'fa:rocket orange');
-        $this->panel->addAction('Nova Pasta', new TAction(array($this, 'onCreateFolder')), 'fa:search');
+        $this->panel->setFormTitle(TSession::getValue('current_folder_name'));
+        // $this->panel->setFormTitle('Minhas Pastas');
+        $this->panel->addHeaderAction('Nova Pasta', new TAction(array($this, 'onCreateFolder')), 'fa:plus-circle green');
         // $this->$btn->class = 'btn btn-sm btn-primary';
+        $this->panel->addHeaderAction('Voltar', new TAction(array($this,'onBackAction')), 'fa:arrow-circle-o-left blue' );
+
         $this->panel->addFields([$this->datagrid]);
         $this->panel->addFields([$this->pageNavigation]);
     }    
 
+    public function onBackAction($params)
+    {
+        TSession::setValue('current_folder_name', 'Minhas Pastas');        
+        TSession::setValue('current_folder_id', '1');
+        // TODO: ARRUMAR ESSE BUG MALDITO
+        // echo '<script>parent.window.location.reload();</script>';
+        // header("Refresh:0");
+        parent::onReload();
+    }
+
+    // public function onReload($param=NULL)
+    // {
+
+    //     $criteria = new TCriteria;
+    //     $user_id = TSession::getValue('userid');
+    //     $criteria->add(new TFilter('user_id', '=', $user_id));
+    //     $criteria->add(new TFilter('folder_id', '=', TSession::getValue('current_folder_id')));
+    //     parent::setCriteria($criteria);
+
+    //     // $this->datagrid->clear();
+    //     parent::onReload();
+    // }
+
     public function onCreateFolder()
     {
+
         $form = new TQuickForm('input_form');
         $form->style = 'padding:15px';
         
         $name = new TEntry('name');        
         $form->addQuickField('Nome', $name);        
         $name->addValidation('name', new TRequiredValidator);
-        $form->addQuickAction('Salvar', new TAction(array($this, 'onConfirm')), 'fa:save green');
+        $action = new TAction(array($this, 'onConfirm'));
+        $form->addQuickAction('Salvar', $action, 'fa:save green');
         
         // show the input dialog
         new TInputDialog('Nova Pasta', $form);
     }
 
 
-    public function onConfirm( $param )
+    public function onConfirm( $params )
     {
+
         try 
         { 
             TTransaction::open('permission'); // open transaction 
 
             $folder = new CustomFolder; 
-            $folder->name = $param['name']; 
+            $folder->name = $params['name']; 
             $folder->user_id = TSession::getValue('userid');
-            $folder->parent_id = 1; //Root
+            $folder->parent_id = TSession::getValue('current_folder_id');
             $folder->store();
             
             new TMessage('info', 'Pasta Criada'); 
@@ -143,44 +194,98 @@ class CustomPrivateMindMapList extends TStandardList
         { 
             new TMessage('error', $e->getMessage()); 
         }
+
+        $this->onReload();
     }    
 
-    // public function onReload($param)
+    public function onViewFolder($params)
+    {
+        if (empty($params['item_id']) or empty($params['item_id'])) {
+            new TMessage('error', 'Parâmetros inválidos');
+            return;
+        } 
+
+        TSession::setValue('current_folder_name', $params['item_name']);
+        TSession::setValue('current_folder_id', $params['item_id']);
+            
+        AdiantiCoreApplication::loadPage(__CLASS__);
+
+            // $parameters=['folder_id' => $params['item_id'] ]);            
+    }
+
+    public function onViewMindMap($params)
+    {
+
+        if (empty($params['item_id'])) {
+            new TMessage('error', 'Parâmetros inválidos');
+            return;
+        } 
+
+        AdiantiCoreApplication::loadPage($class='MindMapPlugin', $method=NULL,
+            $parameters=['id' => $params['item_id'] ]);            
+    }
+
+    public function isFolder($object)
+    {
+        if ($object->item_type == 'folder')
+        {
+            return TRUE;
+        }
+        return FALSE;                
+    }
+
+    public function isMindMap($object)
+    {
+        if ($object->item_type == 'mindmap')
+        {
+            return TRUE;
+        }
+        return FALSE;                            
+    }
+
+}
+
+    // public function onReload($folder_id=NULL)
     // {
-        // parent::onReload($param);
-        // $this->datagrid->clear();
+    //     #$this->datagrid->clear();
 
-        // $item = new StdClass;
-        // $item->code     = '2';
-        // $item->name     = 'Julia Haubert';
-        // $item->address  = 'Rua Expedicionarios';
-        // $item->fone     = '2222-2222';
-        // $this->datagrid->addItem($item);
-        // $this->onReload($param);
+    //     if ($folder_id == NULL) {
+    //         parent::onReload();
+    //         return;
+    //     }
 
-        // try 
-        // { 
-        //     TTransaction::open('permission'); // open transaction 
+    //     $criteria = new TCriteria;
+    //     $user_id = TSession::getValue('userid');
+    //     $criteria->add(new TFilter('user_id', '=', $user_id));
+    //     $criteria->add(new TFilter('folder_id', '=', $folder_id));
 
-        //     $repo = new TRepository('ViewFolderContents');
-        //     $criteria = new TCriteria;
-        //     $user_id = TSession::getValue('userid');
-        //     $criteria->add(new TFilter('f_user_id', '=', $user_id));
+    //     parent::setCriteria($criteria);
+    //     parent::show();
 
-        //     $objetos = $repo->load($criteria);
+    //     // try 
+    //     // { 
+    //     //     TTransaction::open('permission'); // open transaction 
 
-        //     // echo var_dump($objetos);
+    //     //     $repo = new TRepository('ViewFolderContents');
+    //     //     $criteria = new TCriteria;
+    //     //     $user_id = TSession::getValue('userid');
+    //     //     $criteria->add(new TFilter('f_user_id', '=', $user_id));
 
-        //     TTransaction::close(); // Closes the transaction 
-        // } 
-        // catch (Exception $e) 
-        // { 
-        //     new TMessage('error', $e->getMessage()); 
-        // }
+    //     //     $objetos = $repo->load($criteria);
+
+    //     //     // echo var_dump($objetos);
+
+    //     //     TTransaction::close(); // Closes the transaction 
+    //     // } 
+    //     // catch (Exception $e) 
+    //     // { 
+    //     //     new TMessage('error', $e->getMessage()); 
+    //     // }
     // }
 
 
-}
+
+
 
 
         // $this->form = new BootstrapFormBuilder('form_search_CustomPublicMindMap');

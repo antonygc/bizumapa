@@ -6,7 +6,8 @@
     <action>CustomPublicMindMapList</action>
   </menuitem>
   <menuitem label="Meus Mapas">
-    <icon>fa:share-alt-square fa:fw</icon>
+    <!-- <icon>fa:share-alt-square fa:fw</icon> -->
+    <icon>fa:sitemap fa-rotate-270 fa:fw</icon>
     <action>CustomPrivateMindMapList</action>
   </menuitem>
 
