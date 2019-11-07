@@ -25,39 +25,18 @@ class CustomPrivateMindMapList extends TStandardList
         $container->add($this->panel);
         
         parent::add($container);
-
-        // try 
-        // { 
-        //     TTransaction::open('permission'); // open transaction 
-
-        //     $repo = new TRepository('ViewFolderContents');
-        //     $criteria = new TCriteria;
-        //     $user_id = TSession::getValue('userid');
-        //     $criteria->add(new TFilter('f_user_id', '=', $user_id));
-
-        //     $objetos = $repo->load($criteria);
-
-        //     // echo var_dump($objetos);
-
-        //     TTransaction::close(); // Closes the transaction 
-        // } 
-        // catch (Exception $e) 
-        // { 
-        //     new TMessage('error', $e->getMessage()); 
-        // }
-
-
     }
 
     public function createDatagrid()
     {
         parent::setDatabase('permission');            // defines the database
         parent::setActiveRecord('ViewFolderContents');   // defines the active record
-        parent::setDefaultOrder('f_name', 'asc');         // defines the default order
+        parent::setDefaultOrder('item_name', 'asc');         // defines the default order
 
         $criteria = new TCriteria;
         $user_id = TSession::getValue('userid');
-        $criteria->add(new TFilter('f_user_id', '=', $user_id));
+        $criteria->add(new TFilter('user_id', '=', $user_id));
+        $criteria->add(new TFilter('folder_id', '=', '1'));
         parent::setCriteria($criteria);
 
         // parent::addFilterField('id', '=', 'id'); // filterField, operator, formField
@@ -73,21 +52,21 @@ class CustomPrivateMindMapList extends TStandardList
         
         // creates the datagrid columns
         // $column_id                  = new TDataGridColumn('id', 'ID', 'center', 50);
-        $col_f_name = new TDataGridColumn('f_name', 'Pasta', 'left');
-        $col_pmm_name = new TDataGridColumn('pmm_name', 'Mapa Mental', 'left');
+        $col_item_name = new TDataGridColumn('item_name', 'Item', 'left');
+        $col_item_type = new TDataGridColumn('item_type', 'Tipo', 'left');
 
         // add the columns to the DataGrid
-        $this->datagrid->addColumn($col_f_name);
-        $this->datagrid->addColumn($col_pmm_name);
+        $this->datagrid->addColumn($col_item_name);
+        $this->datagrid->addColumn($col_item_type);
 
         // creates the datagrid column actions
-        $order_f_name = new TAction(array($this, 'onReload'));
-        $order_f_name->setParameter('order', 'f_name');
-        $col_f_name->setAction($order_f_name);
+        $order_item_name = new TAction(array($this, 'onReload'));
+        $order_item_name->setParameter('order', 'item_name');
+        $col_item_name->setAction($order_item_name);
         
-        $order_pmm_name = new TAction(array($this, 'onReload'));
-        $order_pmm_name->setParameter('order', 'pmm_name');
-        $col_pmm_name->setAction($order_pmm_name);
+        $order_item_type = new TAction(array($this, 'onReload'));
+        $order_item_type->setParameter('order', 'item_type');
+        $col_item_type->setAction($order_item_type);
 
         $this->createActions();
         
@@ -107,7 +86,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_edit->setButtonClass('btn btn-default');
         $action_edit->setLabel(_t('Edit'));
         $action_edit->setImage('fa:pencil-square-o blue fa-lg');
-        $action_edit->setField('f_id');
+        $action_edit->setField('item_id');
         $this->datagrid->addAction($action_edit);
         
         // create DELETE action
@@ -115,7 +94,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_del->setButtonClass('btn btn-default');
         $action_del->setLabel(_t('Delete'));
         $action_del->setImage('fa:trash-o red fa-lg');
-        $action_del->setField('f_id');
+        $action_del->setField('item_id');
         $this->datagrid->addAction($action_del);                
     }
 
@@ -165,6 +144,41 @@ class CustomPrivateMindMapList extends TStandardList
             new TMessage('error', $e->getMessage()); 
         }
     }    
+
+    // public function onReload($param)
+    // {
+        // parent::onReload($param);
+        // $this->datagrid->clear();
+
+        // $item = new StdClass;
+        // $item->code     = '2';
+        // $item->name     = 'Julia Haubert';
+        // $item->address  = 'Rua Expedicionarios';
+        // $item->fone     = '2222-2222';
+        // $this->datagrid->addItem($item);
+        // $this->onReload($param);
+
+        // try 
+        // { 
+        //     TTransaction::open('permission'); // open transaction 
+
+        //     $repo = new TRepository('ViewFolderContents');
+        //     $criteria = new TCriteria;
+        //     $user_id = TSession::getValue('userid');
+        //     $criteria->add(new TFilter('f_user_id', '=', $user_id));
+
+        //     $objetos = $repo->load($criteria);
+
+        //     // echo var_dump($objetos);
+
+        //     TTransaction::close(); // Closes the transaction 
+        // } 
+        // catch (Exception $e) 
+        // { 
+        //     new TMessage('error', $e->getMessage()); 
+        // }
+    // }
+
 
 }
 

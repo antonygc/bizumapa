@@ -70,10 +70,15 @@ INSERT INTO custom_folder VALUES(1,'__ROOT__',1,1);
 -- LEFT JOIN custom_private_mind_map pmm ON f.id = pmm.folder_id
 -- WHERE f.user_id = 2;
 
-CREATE VIEW view_folder_contents AS
-SELECT f.id f_id, f.name f_name, f.parent_id f_parent_id, f.user_id f_user_id,
-	   pmm.id pmm_id, pmm.name pmm_name, pmm.user_id pmm_user_id, pmm.folder_id pmm_folder_id
-FROM custom_folder f
-LEFT JOIN custom_private_mind_map pmm ON f.id = pmm.folder_id;
+-- SELECT f.id f_id, f.name f_name, f.parent_id f_parent_id, f.user_id f_user_id,
+-- 	   pmm.id pmm_id, pmm.name pmm_name, pmm.user_id pmm_user_id, pmm.folder_id pmm_folder_id
+-- FROM custom_folder f
+-- LEFT JOIN custom_private_mind_map pmm ON f.id = pmm.folder_id;
 -- WHERE f.user_id = 2;
 
+CREATE VIEW view_folder_contents AS
+SELECT f.id as item_id, f.name as item_name, f.user_id as user_id, 'folder' as item_type, f.parent_id as folder_id
+FROM custom_folder f
+UNION ALL
+SELECT pmm.id as item_id, pmm.name as item_name, pmm.user_id as user_id, 'mindmap' as item_type, pmm.folder_id as folder_id
+FROM custom_private_mind_map pmm;
