@@ -14,6 +14,12 @@ class CustomPrivateMindMapList extends TStandardList
      */
     public function __construct()
     {
+
+        if (TSession::getValue('current_folder_id') == NULL) {
+            TSession::setValue('current_folder_name', 'Minhas Pastas');        
+            TSession::setValue('current_folder_id', '1');        
+        }
+
         parent::__construct();
 
         $this->createDatagrid();
@@ -25,11 +31,6 @@ class CustomPrivateMindMapList extends TStandardList
         $container->add($this->panel);
         
         parent::add($container);
-
-        if (!TSession::getValue('current_folder_id')) {
-            TSession::setValue('current_folder_name', 'Minhas Pastas');        
-            TSession::setValue('current_folder_id', '1');        
-        }
 
     }
 
@@ -53,19 +54,31 @@ class CustomPrivateMindMapList extends TStandardList
         // parent::addFilterField('subject_matter_id', '=', 'subject_matter_id'); // filterField, operator, formField
 
         // creates a DataGrid
+        // TScript::create('$("#my_table tr:eq(0) th:eq(0)").text("My Text");');
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
         $this->datagrid->datatable = 'true';
         $this->datagrid->style = 'width: 100%';
-        $this->datagrid->setHeight(320);
+        $this->datagrid->id = 'my_table';
         
         // creates the datagrid columns
         // $column_id                  = new TDataGridColumn('id', 'ID', 'center', 50);
-        $col_item_name = new TDataGridColumn('item_name', 'Item', 'left', '');
-        $col_item_type = new TDataGridColumn('item_type', 'Tipo', 'left');
+        $col_item_type = new TDataGridColumn('item_type', 'Tipo', 'center', '15%');
+        $col_item_name = new TDataGridColumn('item_name', 'Item', 'left');
+
+        $col_item_type->setTransformer( function($value, $object, $row) {
+            $div = new TElement('span');
+            if ($object->item_type == 'folder') {
+                $div->add('<i class="fa fa-folder-open-o fa-lg blue"></i>');
+            } else {
+                $div->add('<i class="fa fa-sitemap fa-rotate-270 red fa-lg"></i>');
+            }
+            // $div->add($object->item_type);
+            return $div;
+        });
 
         // add the columns to the DataGrid
+        $this->datagrid->addColumn($col_item_type);
         $this->datagrid->addColumn($col_item_name);
-        // $this->datagrid->addColumn($col_item_type);
 
         // creates the datagrid column actions
         $order_item_name = new TAction(array($this, 'onReload'));
@@ -89,36 +102,42 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function createActions()
     {
-        $action1 = new TDataGridAction(array($this, 'onViewFolder'));
-        $action1->setLabel('Ver Pasta');
-        $action1->setImage('fa:folder-open-o');
-        $action1->setField('item_id');
-        $action1->setField('item_name');
-        $action1->setDisplayCondition( array($this, 'isFolder') );
-        $this->datagrid->addAction($action1);
 
-        $action2 = new TDataGridAction(array($this, 'onViewMindMap'));
-        $action2->setLabel('Ver Mapa Mental');
-        $action2->setImage('fa:sitemap fa-rotate-27');
-        $action2->setField('item_id');
-        $action2->setDisplayCondition( array($this, 'isMindMap') );        
-        $this->datagrid->addAction($action2);
+        // create VIEW action
+        $action_view = new TDataGridAction(array($this, 'onViewItem'));
+        $action_view->setLabel('Ver');
+        $action_view->setImage('fa:search');
+        $action_view->setField('item_id');
+        $action_view->setField('item_name');
+        $action_view->setField('item_type');
 
         // create EDIT action
-        $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));
+        $action_edit = new TDataGridAction(array($this, 'onEditItem'));
         $action_edit->setButtonClass('btn btn-default');
         $action_edit->setLabel(_t('Edit'));
         $action_edit->setImage('fa:pencil-square-o blue fa-lg');
         $action_edit->setField('item_id');
-        $this->datagrid->addAction($action_edit);
+        // $this->datagrid->addAction($action_edit);
         
         // create DELETE action
-        $action_del = new TDataGridAction(array($this, 'onDelete'));
+        $action_del = new TDataGridAction(array($this, 'onDeleteItem'));
         $action_del->setButtonClass('btn btn-default');
         $action_del->setLabel(_t('Delete'));
         $action_del->setImage('fa:trash-o red fa-lg');
         $action_del->setField('item_id');
-        $this->datagrid->addAction($action_del);                
+
+        $action_group = new TDataGridActionGroup('', 'bs:th');
+        $action_group->addHeader('Opções');
+        $action_group->addAction($action_view);
+        $action_group->addAction($action_edit);
+
+        $action_group->addSeparator();
+        $action_group->addHeader('Outras Opções');
+        $action_group->addAction($action_del);
+        
+        // add the actions to the datagrid
+        $this->datagrid->addActionGroup($action_group);
+
     }
 
     public function createPanel()
@@ -136,26 +155,11 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onBackAction($params)
     {
-        TSession::setValue('current_folder_name', 'Minhas Pastas');        
+
         TSession::setValue('current_folder_id', '1');
-        // TODO: ARRUMAR ESSE BUG MALDITO
-        // echo '<script>parent.window.location.reload();</script>';
-        // header("Refresh:0");
-        parent::onReload();
+        TSession::setValue('current_folder_name', 'Minhas Pastas');        
+        AdiantiCoreApplication::loadPage(__CLASS__);
     }
-
-    // public function onReload($param=NULL)
-    // {
-
-    //     $criteria = new TCriteria;
-    //     $user_id = TSession::getValue('userid');
-    //     $criteria->add(new TFilter('user_id', '=', $user_id));
-    //     $criteria->add(new TFilter('folder_id', '=', TSession::getValue('current_folder_id')));
-    //     parent::setCriteria($criteria);
-
-    //     // $this->datagrid->clear();
-    //     parent::onReload();
-    // }
 
     public function onCreateFolder()
     {
@@ -176,7 +180,6 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onConfirm( $params )
     {
-
         try 
         { 
             TTransaction::open('permission'); // open transaction 
@@ -198,19 +201,35 @@ class CustomPrivateMindMapList extends TStandardList
         $this->onReload();
     }    
 
+
+    public function onViewItem($params)
+    {
+        if (empty($params['item_type'])) {
+            return;
+        }
+
+        if ($params['item_type'] == 'folder') {
+            $this->onViewFolder($params);
+        } else {
+            $this->onViewMindMap($params);
+        }
+
+    }
+
     public function onViewFolder($params)
     {
-        if (empty($params['item_id']) or empty($params['item_id'])) {
+        if (empty($params['item_id']) or 
+            empty($params['item_name']) or
+            empty($params['item_type'])) {
+
             new TMessage('error', 'Parâmetros inválidos');
             return;
         } 
 
-        TSession::setValue('current_folder_name', $params['item_name']);
         TSession::setValue('current_folder_id', $params['item_id']);
+        TSession::setValue('current_folder_name', $params['item_name']);
             
         AdiantiCoreApplication::loadPage(__CLASS__);
-
-            // $parameters=['folder_id' => $params['item_id'] ]);            
     }
 
     public function onViewMindMap($params)
@@ -225,23 +244,17 @@ class CustomPrivateMindMapList extends TStandardList
             $parameters=['id' => $params['item_id'] ]);            
     }
 
-    public function isFolder($object)
-    {
-        if ($object->item_type == 'folder')
-        {
-            return TRUE;
-        }
-        return FALSE;                
-    }
 
-    public function isMindMap($object)
+    public function onEditItem($params)
     {
-        if ($object->item_type == 'mindmap')
-        {
-            return TRUE;
-        }
-        return FALSE;                            
-    }
+        # code...
+    }   
+
+    public function onDeleteItem($params)
+    {
+        # code...
+    }  
+
 
 }
 
