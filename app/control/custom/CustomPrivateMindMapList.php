@@ -211,7 +211,7 @@ class CustomPrivateMindMapList extends TStandardList
             new TMessage('error', $e->getMessage()); 
         }
 
-        $this->onReload();
+        AdiantiCoreApplication::loadPage(__CLASS__);
     }    
 
 
@@ -309,7 +309,7 @@ class CustomPrivateMindMapList extends TStandardList
             new TMessage('error', $e->getMessage()); 
         }
 
-        $this->onReload();
+        AdiantiCoreApplication::loadPage(__CLASS__);
     }
 
     public function onEditMindMapConfirm($params)
@@ -333,7 +333,7 @@ class CustomPrivateMindMapList extends TStandardList
             new TMessage('error', $e->getMessage()); 
         }
 
-        $this->onReload();        
+        AdiantiCoreApplication::loadPage(__CLASS__);
     }    
 
     public function onCopyItem($params)
@@ -359,39 +359,32 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onConfirmDelete($params)
     {
-        if ($params['item_type'] == 'folder') {
-            CustomPrivateMindMapList::DeleteFolder($params);
-        } else {
-            CustomPrivateMindMapList::DeleteMindMap($params);
-        }
-        $this->onReload();
-    }
-
-    public static function DeleteFolder($params)
-    {
         try
         {
             TTransaction::open('permission'); // abre uma transação
 
-            $folder = new CustomFolder($params['item_id']);
-            $folder->delete();      
+            if ($params['item_type'] == 'folder') {
+                // CustomPrivateMindMapList::DeleteFolder($params);
+                $object = new CustomFolder($params['item_id']);
+            } else {
+                // CustomPrivateMindMapList::DeleteMindMap($params);
+                $object = new CustomPrivateMindMap($params['item_id']);
+            }
+
+            $object->delete();      
 
             TTransaction::close(); // fecha a transação.
 
             new TMessage('info', 'Itens excuídos com sucesso!'); 
+            AdiantiCoreApplication::loadPage(__CLASS__);
 
         }
         catch (Exception $e)
         {
             new TMessage('error', $e->getMessage());
-        }        
-    }
+        }
 
-    public static function DeleteMindMap($params)
-    {
-        # code...
-    }
-     
+    }     
 
 }
 

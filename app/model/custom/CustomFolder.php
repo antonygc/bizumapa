@@ -56,16 +56,13 @@ class CustomFolder extends TRecord
         $object = (object) $this->toArray();
 
         $children = CustomFolder::getChildren($object->id);
+        array_push($children, $object->id); // Exclui a própria pasta além dos filhos
         rsort($children);
 
-        $maps_parents = $children + [$object->id];
-
-        CustomPrivateMindMap::where('folder_id', 'IN', $maps_parents )->delete();
+        CustomPrivateMindMap::where('folder_id', 'IN', $children )->delete();
 
         // TODO: ERRO DE FK
         // CustomFolder::where('id', 'IN', $children)->delete();
-
-        $children = $children + [$object->id];
 
         foreach ($children as $i => $v) {
             CustomFolder::where('id', '=', $v)->delete();
