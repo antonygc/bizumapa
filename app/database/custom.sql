@@ -39,6 +39,9 @@ CREATE TABLE custom_folder (
 	FOREIGN KEY(parent_id) REFERENCES custom_folder(id)
     ) ENGINE=InnoDB;
 
+UPDATE custom_folder SET parent_id = NULL WHERE id = 1;
+ALTER TABLE custom_folder MODIFY parent_id INT;
+
 CREATE TABLE custom_private_mind_map (
 	id INT PRIMARY KEY NOT NULL, 
 	name VARCHAR(100) NOT NULL,
@@ -54,34 +57,32 @@ CREATE TABLE custom_private_mind_map (
     ) ENGINE=InnoDB;
 
 
-INSERT INTO custom_folder VALUES(1,'__ROOT__',1,1);
+INSERT INTO custom_folder VALUES(1,'__ROOT__',1, NULL);
 
 
-	-- DROP TABLE custom_theme;
-	-- DROP TABLE custom_subject_matter;
-	-- DROP TABLE custom_public_mind_map;
-	-- DROP TABLE custom_folder;
-	-- DROP TABLE custom_private_mind_map;
-
--- CREATE VIEW view_folder_private_map AS
--- SELECT f.id, f.name, f.parent_id, f.user_id,
--- 	   pmm.id, pmm.name, pmm.user_id, pmm.folder_id
--- FROM custom_folder f
--- LEFT JOIN custom_private_mind_map pmm ON f.id = pmm.folder_id
--- WHERE f.user_id = 2;
-
--- CREATE VIEW view_folder_contents AS
--- SELECT f.id as item_id, f.name as item_name, f.user_id as user_id, 'folder' as item_type, f.parent_id as folder_id
--- FROM custom_folder f
--- UNION ALL
--- SELECT pmm.id as item_id, pmm.name as item_name, pmm.user_id as user_id, 'mindmap' as item_type, pmm.folder_id as folder_id
--- FROM custom_private_mind_map pmm;
-
+-- DROP TABLE custom_theme;
+-- DROP TABLE custom_subject_matter;
+-- DROP TABLE custom_public_mind_map;
+-- DROP TABLE custom_folder;
+-- DROP TABLE custom_private_mind_map;
 
 CREATE OR REPLACE VIEW view_folder_contents AS
-SELECT f.id as item_id, f.name as item_name, f.user_id as user_id, 'folder' as item_type, f.parent_id as folder_id
+SELECT f.id as item_id, 
+	   f.name as item_name, 
+	   f.user_id as user_id, 
+	   'folder' as item_type, 
+	   f.parent_id as folder_id
 FROM custom_folder as f
 UNION ALL
-SELECT pmm.id as item_id, pmm.name as item_name, pmm.user_id as user_id, 'mindmap' as item_type, pmm.folder_id as folder_id
+SELECT pmm.id as item_id, 
+	   pmm.name as item_name, 
+	   pmm.user_id as user_id, 
+	   'mindmap' as item_type, 
+	   pmm.folder_id as folder_id
 FROM custom_private_mind_map pmm;
+
+
+
+
+
 

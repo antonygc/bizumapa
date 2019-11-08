@@ -121,7 +121,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_edit->setField('item_type');        
 
         // create COPY action
-        $action_copy = new TDataGridAction(array($this, 'onEditItem'));
+        $action_copy = new TDataGridAction(array($this, 'onCopyItem'));
         $action_copy->setButtonClass('btn btn-default');
         $action_copy->setLabel('Copiar');
         $action_copy->setImage('fa:copy  blue fa-lg');
@@ -135,6 +135,8 @@ class CustomPrivateMindMapList extends TStandardList
         $action_del->setLabel(_t('Delete'));
         $action_del->setImage('fa:trash-o red fa-lg');
         $action_del->setField('item_id');
+        $action_del->setField('item_name');
+        $action_del->setField('item_type');              
 
         $action_group = new TDataGridActionGroup('', 'bs:th');
         $action_group->addHeader('Opções');
@@ -258,7 +260,6 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onEditItem($params)
     {
-
         if (empty($params['item_id']) or 
             empty($params['item_name']) or
             empty($params['item_type'])) {
@@ -290,7 +291,6 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onEditFolderConfirm($params)
     {
-        
         try 
         { 
             TTransaction::open('permission'); // open transaction 
@@ -336,11 +336,62 @@ class CustomPrivateMindMapList extends TStandardList
         $this->onReload();        
     }    
 
+    public function onCopyItem($params)
+    {
+    }
+
     public function onDeleteItem($params)
     {
-        # code...
-    }  
 
+        if (empty($params['item_id']) or 
+            empty($params['item_type'])) {
+
+            new TMessage('error', 'Parâmetros inválidos');
+            return;
+        } 
+
+        $action = new TAction(array($this, 'onConfirmDelete'));
+        $action->setParameters($params);
+        
+        new TQuestion('Deseja realmente excluir o item ?', $action);
+
+    }          
+
+    public function onConfirmDelete($params)
+    {
+        if ($params['item_type'] == 'folder') {
+            CustomPrivateMindMapList::DeleteFolder($params);
+        } else {
+            CustomPrivateMindMapList::DeleteMindMap($params);
+        }
+        $this->onReload();
+    }
+
+    public static function DeleteFolder($params)
+    {
+        try
+        {
+            TTransaction::open('permission'); // abre uma transação
+
+            $folder = new CustomFolder($params['item_id']);
+            $folder->delete();      
+
+            TTransaction::close(); // fecha a transação.
+
+            new TMessage('info', 'Itens excuídos com sucesso!'); 
+
+        }
+        catch (Exception $e)
+        {
+            new TMessage('error', $e->getMessage());
+        }        
+    }
+
+    public static function DeleteMindMap($params)
+    {
+        # code...
+    }
+     
 
 }
 

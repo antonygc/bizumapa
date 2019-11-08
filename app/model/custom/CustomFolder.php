@@ -49,4 +49,64 @@ class CustomFolder extends TRecord
         return $this->parent_folder;
     }
 
+    // public function onBeforeDelete($object)
+    public function delete($id = NULL)
+    {
+
+        $object = (object) $this->toArray();
+
+        $children = CustomFolder::getChildren($object->id);
+        rsort($children);
+
+        $maps_parents = $children + [$object->id];
+
+        CustomPrivateMindMap::where('folder_id', 'IN', $maps_parents )->delete();
+
+        // TODO: ERRO DE FK
+        // CustomFolder::where('id', 'IN', $children)->delete();
+
+        $children = $children + [$object->id];
+
+        foreach ($children as $i => $v) {
+            CustomFolder::where('id', '=', $v)->delete();
+        }
+
+    }
+
+    public static function getChildren($id)
+    {
+
+        $conn = TTransaction::get(); // obtém a conexão
+        
+        $_id = (int) $id;
+
+        // https://stackoverflow.com/questions/28363893/mysql-select-recursive-get-all-child-with-multiple-level
+
+        $stmt = "
+            SELECT GROUP_CONCAT(lv SEPARATOR ',') as children 
+            FROM (
+                SELECT @pv:=(SELECT GROUP_CONCAT(id SEPARATOR ',') FROM custom_folder 
+                WHERE FIND_IN_SET(parent_id, @pv)) AS lv FROM custom_folder 
+            JOIN
+                (SELECT @pv:=". $_id . ") tmp) a;" ;
+
+        $sth = $conn->prepare($stmt);
+        
+        $sth->execute(array(3,12));
+        $result = $sth->fetchAll();
+            
+        $children = $result[0]['children'];
+
+        if (!is_null($children)) {
+            $children = explode(',', $children);
+        }
+
+        return (array) $children; 
+    }    
+
+
+
+
+
+
 }
