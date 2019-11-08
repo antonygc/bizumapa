@@ -2,12 +2,12 @@
 <menu>
 
   <menuitem label="Mapas Públicos">
-    <icon>fa:globe fa-lg fa:fw</icon>
+    <icon>fa:globe fa:fw</icon>
     <action>CustomPublicMindMapList</action>
   </menuitem>
   <menuitem label="Meus Mapas">
     <!-- <icon>fa:share-alt-square fa:fw</icon> -->
-    <icon>fa:sitemap fa-rotate-270 fa-lg fa:fw</icon>
+    <icon>fa:sitemap fa-rotate-270 fa:fw</icon>
     <action>CustomPrivateMindMapList</action>
   </menuitem>
 
@@ -25,19 +25,6 @@
     </menu>
   </menuitem>
 
-  <menuitem label="Mapas">
-    <icon>fa:file-text-o fa-fw</icon>
-    <menu>
-      <menuitem label="Mapas Públicos">
-        <icon>fa:cloud-upload fa-fw</icon>
-        <action>PublicMindMap</action>
-      </menuitem>
-      <menuitem label="Meus Mapas">
-        <icon>fa:cloud-upload fa-fw</icon>
-        <action>PrivateMindMap</action>
-      </menuitem>
-    </menu>
-  </menuitem>
   <menuitem label="_t{Administration}">
     <icon>fa:university fa-fw</icon>
     <menu>

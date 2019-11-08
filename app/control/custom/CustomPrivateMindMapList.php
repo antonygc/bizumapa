@@ -68,9 +68,9 @@ class CustomPrivateMindMapList extends TStandardList
         $col_item_type->setTransformer( function($value, $object, $row) {
             $div = new TElement('span');
             if ($object->item_type == 'folder') {
-                $div->add('<i class="fa fa-folder-open-o fa-lg blue"></i>');
+                $div->add('<i class="fa fa-folder-open blue"></i>');
             } else {
-                $div->add('<i class="fa fa-sitemap fa-rotate-270 red fa-lg"></i>');
+                $div->add('<i class="fa fa-sitemap fa-rotate-270"></i>');
             }
             // $div->add($object->item_type);
             return $div;
@@ -106,7 +106,7 @@ class CustomPrivateMindMapList extends TStandardList
         // create VIEW action
         $action_view = new TDataGridAction(array($this, 'onViewItem'));
         $action_view->setLabel('Ver');
-        $action_view->setImage('fa:search');
+        $action_view->setImage('fa:eye blue fa-lg');
         $action_view->setField('item_id');
         $action_view->setField('item_name');
         $action_view->setField('item_type');
@@ -114,10 +114,20 @@ class CustomPrivateMindMapList extends TStandardList
         // create EDIT action
         $action_edit = new TDataGridAction(array($this, 'onEditItem'));
         $action_edit->setButtonClass('btn btn-default');
-        $action_edit->setLabel(_t('Edit'));
+        $action_edit->setLabel('Renomear');
         $action_edit->setImage('fa:pencil-square-o blue fa-lg');
         $action_edit->setField('item_id');
-        // $this->datagrid->addAction($action_edit);
+        $action_edit->setField('item_name');
+        $action_edit->setField('item_type');        
+
+        // create COPY action
+        $action_copy = new TDataGridAction(array($this, 'onEditItem'));
+        $action_copy->setButtonClass('btn btn-default');
+        $action_copy->setLabel('Copiar');
+        $action_copy->setImage('fa:copy  blue fa-lg');
+        $action_copy->setField('item_id');  
+        $action_copy->setField('item_name');
+        $action_copy->setField('item_type');              
         
         // create DELETE action
         $action_del = new TDataGridAction(array($this, 'onDeleteItem'));
@@ -130,6 +140,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_group->addHeader('Opções');
         $action_group->addAction($action_view);
         $action_group->addAction($action_edit);
+        $action_group->addAction($action_copy);
 
         $action_group->addSeparator();
         $action_group->addHeader('Outras Opções');
@@ -170,7 +181,7 @@ class CustomPrivateMindMapList extends TStandardList
         $name = new TEntry('name');        
         $form->addQuickField('Nome', $name);        
         $name->addValidation('name', new TRequiredValidator);
-        $action = new TAction(array($this, 'onConfirm'));
+        $action = new TAction(array($this, 'onCreateFolderConfirm'));
         $form->addQuickAction('Salvar', $action, 'fa:save green');
         
         // show the input dialog
@@ -178,7 +189,7 @@ class CustomPrivateMindMapList extends TStandardList
     }
 
 
-    public function onConfirm( $params )
+    public function onCreateFolderConfirm( $params )
     {
         try 
         { 
@@ -247,8 +258,66 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onEditItem($params)
     {
-        # code...
-    }   
+
+        if (empty($params['item_id']) or 
+            empty($params['item_name']) or
+            empty($params['item_type'])) {
+
+            new TMessage('error', 'Parâmetros inválidos');
+            return;
+        } 
+
+        $form = new TQuickForm('input_form');
+        $form->style = 'padding:15px';
+        
+        $name = new TEntry('new_name');        
+        $name->setValue($params['item_name']);
+        $form->addQuickField('Nome', $name);        
+        $name->addValidation('new_name', new TRequiredValidator);
+
+        if ($params['item_type'] == 'folder') {
+            $callback = array($this, 'onEditFolderConfirm');
+        } else {
+            $callback = array($this, 'onEditMindMapConfirm');
+        }
+        
+        $action = new TAction($callback, $params);
+        $form->addQuickAction('Salvar', $action, 'fa:save green');
+        
+        new TInputDialog('Renomear Item', $form);
+    }
+
+
+    public function onEditFolderConfirm($params)
+    {
+        echo var_dump($params);
+        return;
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
+
+            $folder = new CustomFolder($params['item_id']); 
+            $folder->name = $params['name']; 
+            $folder->user_id = TSession::getValue('userid');
+            $folder->parent_id = TSession::getValue('current_folder_id');
+            $folder->store();
+            
+            new TMessage('info', 'Pasta Criada'); 
+            TTransaction::close(); // Closes the transaction 
+        } 
+        catch (Exception $e) 
+        { 
+            new TMessage('error', $e->getMessage()); 
+        }
+
+        $this->onReload();
+    }
+
+    public function onEditMindMapConfirm($params)
+    {
+        echo var_dump($params);
+        return;
+    }    
 
     public function onDeleteItem($params)
     {
@@ -257,48 +326,6 @@ class CustomPrivateMindMapList extends TStandardList
 
 
 }
-
-    // public function onReload($folder_id=NULL)
-    // {
-    //     #$this->datagrid->clear();
-
-    //     if ($folder_id == NULL) {
-    //         parent::onReload();
-    //         return;
-    //     }
-
-    //     $criteria = new TCriteria;
-    //     $user_id = TSession::getValue('userid');
-    //     $criteria->add(new TFilter('user_id', '=', $user_id));
-    //     $criteria->add(new TFilter('folder_id', '=', $folder_id));
-
-    //     parent::setCriteria($criteria);
-    //     parent::show();
-
-    //     // try 
-    //     // { 
-    //     //     TTransaction::open('permission'); // open transaction 
-
-    //     //     $repo = new TRepository('ViewFolderContents');
-    //     //     $criteria = new TCriteria;
-    //     //     $user_id = TSession::getValue('userid');
-    //     //     $criteria->add(new TFilter('f_user_id', '=', $user_id));
-
-    //     //     $objetos = $repo->load($criteria);
-
-    //     //     // echo var_dump($objetos);
-
-    //     //     TTransaction::close(); // Closes the transaction 
-    //     // } 
-    //     // catch (Exception $e) 
-    //     // { 
-    //     //     new TMessage('error', $e->getMessage()); 
-    //     // }
-    // }
-
-
-
-
 
 
         // $this->form = new BootstrapFormBuilder('form_search_CustomPublicMindMap');
