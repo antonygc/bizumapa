@@ -290,19 +290,18 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onEditFolderConfirm($params)
     {
-        echo var_dump($params);
-        return;
+        
         try 
         { 
             TTransaction::open('permission'); // open transaction 
 
             $folder = new CustomFolder($params['item_id']); 
-            $folder->name = $params['name']; 
+            $folder->name = $params['new_name']; 
             $folder->user_id = TSession::getValue('userid');
             $folder->parent_id = TSession::getValue('current_folder_id');
             $folder->store();
             
-            new TMessage('info', 'Pasta Criada'); 
+            new TMessage('info', 'Pasta renomeada com sucesso!'); 
             TTransaction::close(); // Closes the transaction 
         } 
         catch (Exception $e) 
@@ -315,8 +314,26 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function onEditMindMapConfirm($params)
     {
-        echo var_dump($params);
-        return;
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
+
+            $folder = new CustomPrivateMindMap($params['item_id']); 
+            $folder->name = $params['new_name']; 
+            $folder->content = $folder->content;
+            $folder->user_id = TSession::getValue('userid');
+            $folder->parent_id = TSession::getValue('current_folder_id');
+            $folder->store();
+            
+            new TMessage('info', 'Mapa Mental renomeado com sucesso!'); 
+            TTransaction::close(); // Closes the transaction 
+        } 
+        catch (Exception $e) 
+        { 
+            new TMessage('error', $e->getMessage()); 
+        }
+
+        $this->onReload();        
     }    
 
     public function onDeleteItem($params)
