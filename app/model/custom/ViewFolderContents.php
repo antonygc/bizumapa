@@ -12,7 +12,7 @@
 			parent::addAttribute('item_name');
 			parent::addAttribute('user_id');
 			parent::addAttribute('item_type');
-			parent::addAttribute('folder_id');
+			parent::addAttribute('parent_id');
 	    }
 
     }

@@ -33,14 +33,14 @@ CREATE TABLE custom_public_mind_map (
 CREATE TABLE custom_folder (
 	id INT PRIMARY KEY NOT NULL, 
 	name VARCHAR(100) NOT NULL,
-	parent_id INT NOT NULL,
-	user_id INTEGER NOT NULL,
+	parent_id INT,
+	user_id INT NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES system_user(id),
 	FOREIGN KEY(parent_id) REFERENCES custom_folder(id)
     ) ENGINE=InnoDB;
 
-UPDATE custom_folder SET parent_id = NULL WHERE id = 1;
-ALTER TABLE custom_folder MODIFY parent_id INT;
+-- UPDATE custom_folder SET parent_id = NULL WHERE id = 1;
+-- ALTER TABLE custom_folder MODIFY parent_id INT;
 
 CREATE TABLE custom_private_mind_map (
 	id INT PRIMARY KEY NOT NULL, 
@@ -57,7 +57,7 @@ CREATE TABLE custom_private_mind_map (
     ) ENGINE=InnoDB;
 
 
-INSERT INTO custom_folder VALUES(1,'__ROOT__',1, NULL);
+INSERT INTO custom_folder VALUES(1, 'Minhas Pastas', NULL, 1);
 
 
 -- DROP TABLE custom_theme;
@@ -71,14 +71,14 @@ SELECT f.id as item_id,
 	   f.name as item_name, 
 	   f.user_id as user_id, 
 	   'folder' as item_type, 
-	   f.parent_id as folder_id
+	   f.parent_id as parent_id
 FROM custom_folder as f
 UNION ALL
 SELECT pmm.id as item_id, 
 	   pmm.name as item_name, 
 	   pmm.user_id as user_id, 
 	   'mindmap' as item_type, 
-	   pmm.folder_id as folder_id
+	   pmm.folder_id as parent_id
 FROM custom_private_mind_map pmm;
 
 

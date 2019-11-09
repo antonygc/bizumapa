@@ -16,8 +16,9 @@ class CustomPrivateMindMapList extends TStandardList
     {
 
         if (TSession::getValue('current_folder_id') == NULL) {
-            TSession::setValue('current_folder_name', 'Minhas Pastas');        
             TSession::setValue('current_folder_id', '1');        
+            TSession::setValue('current_folder_name', 'Minhas Pastas');        
+            TSession::setValue('current_folder_parent_id', NULL);        
         }
 
         parent::__construct();
@@ -44,7 +45,7 @@ class CustomPrivateMindMapList extends TStandardList
         $criteria = new TCriteria;
         $user_id = TSession::getValue('userid');
         $criteria->add(new TFilter('user_id', '=', $user_id));
-        $criteria->add(new TFilter('folder_id', '=', TSession::getValue('current_folder_id')));
+        $criteria->add(new TFilter('parent_id', '=', TSession::getValue('current_folder_id')));
 
         parent::setCriteria($criteria);
 
@@ -110,6 +111,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_view->setField('item_id');
         $action_view->setField('item_name');
         $action_view->setField('item_type');
+        $action_view->setField('parent_id');
 
         // create EDIT action
         $action_edit = new TDataGridAction(array($this, 'onEditItem'));
@@ -119,6 +121,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_edit->setField('item_id');
         $action_edit->setField('item_name');
         $action_edit->setField('item_type');        
+        $action_edit->setField('parent_id');
 
         // create COPY action
         $action_copy = new TDataGridAction(array($this, 'onCopyItem'));
@@ -128,6 +131,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_copy->setField('item_id');  
         $action_copy->setField('item_name');
         $action_copy->setField('item_type');              
+        $action_copy->setField('parent_id');
         
         // create DELETE action
         $action_del = new TDataGridAction(array($this, 'onDeleteItem'));
@@ -137,6 +141,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_del->setField('item_id');
         $action_del->setField('item_name');
         $action_del->setField('item_type');              
+        $action_del->setField('parent_id');
 
         $action_group = new TDataGridActionGroup('', 'bs:th');
         $action_group->addHeader('Opções');
@@ -169,8 +174,39 @@ class CustomPrivateMindMapList extends TStandardList
     public function onBackAction($params)
     {
 
-        TSession::setValue('current_folder_id', '1');
-        TSession::setValue('current_folder_name', 'Minhas Pastas');        
+        $curr_parent_id = TSession::getValue('current_folder_parent_id');  
+
+        if (!$curr_parent_id){
+            // Já está na raiz
+            return;
+        }
+
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
+
+            $criteria = new TCriteria;
+            $criteria->add(new TFilter('id', '=', $curr_parent_id));
+
+            $repository = new TRepository('CustomFolder'); 
+            $folders = $repository->load($criteria); 
+
+            $folder = $folders[0];
+
+            TSession::setValue('current_folder_id', $folder->id);
+            TSession::setValue('current_folder_name', $folder->name);              
+            TSession::setValue('current_folder_parent_id', $folder->parent_id);              
+            
+            TTransaction::close(); // Closes the transaction 
+        } 
+        catch (Exception $e) 
+        { 
+            echo var_dump($e);
+            
+            new TMessage('error', var_dump($e)); 
+            // new TMessage('error', $e->getMessage()); 
+        }
+
         AdiantiCoreApplication::loadPage(__CLASS__);
     }
 
@@ -233,7 +269,8 @@ class CustomPrivateMindMapList extends TStandardList
     {
         if (empty($params['item_id']) or 
             empty($params['item_name']) or
-            empty($params['item_type'])) {
+            empty($params['item_type']) or
+            empty($params['parent_id'])) {
 
             new TMessage('error', 'Parâmetros inválidos');
             return;
@@ -241,6 +278,7 @@ class CustomPrivateMindMapList extends TStandardList
 
         TSession::setValue('current_folder_id', $params['item_id']);
         TSession::setValue('current_folder_name', $params['item_name']);
+        TSession::setValue('current_folder_parent_id', $params['parent_id']);
             
         AdiantiCoreApplication::loadPage(__CLASS__);
     }
@@ -318,12 +356,12 @@ class CustomPrivateMindMapList extends TStandardList
         { 
             TTransaction::open('permission'); // open transaction 
 
-            $folder = new CustomPrivateMindMap($params['item_id']); 
-            $folder->name = $params['new_name']; 
-            $folder->content = $folder->content;
-            $folder->user_id = TSession::getValue('userid');
-            $folder->parent_id = TSession::getValue('current_folder_id');
-            $folder->store();
+            $mindmap = new CustomPrivateMindMap($params['item_id']); 
+            $mindmap->name = $params['new_name']; 
+            $mindmap->content = $mindmap->content;
+            $mindmap->user_id = TSession::getValue('userid');
+            $mindmap->parent_id = TSession::getValue('current_folder_id');
+            $mindmap->store();
             
             new TMessage('info', 'Mapa Mental renomeado com sucesso!'); 
             TTransaction::close(); // Closes the transaction 
