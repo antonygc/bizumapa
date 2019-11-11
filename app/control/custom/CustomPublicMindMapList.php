@@ -216,8 +216,6 @@ class CustomPublicMindMapList extends TStandardList
 
     public function onConfirm($params)
     {
-        // echo var_dump($params);
-
         if (empty($params['id'])) {
             new TMessage('error', 'Parâmetros incorretos');
             return;
@@ -227,19 +225,18 @@ class CustomPublicMindMapList extends TStandardList
             $params['folder_id'] = '1'; // ROOT
         }
 
-
-        // TODO: RECUPERAR CONTEÚDO DO MAPA COM $params['id']
-
         try 
         { 
             TTransaction::open('permission'); // open transaction 
 
-            $folder = new CustomPrivateMindMap; 
-            $folder->name = $params['name']; 
-            $folder->content = null; 
-            $folder->user_id = TSession::getValue('userid');
-            $folder->folder_id = $params['folder_id']; ;
-            $folder->store();
+            $public_mindmap = new CustomPublicMindMap((int) $params['id']);
+
+            $mindmap = new CustomPrivateMindMap; 
+            $mindmap->name = $params['name']; 
+            $mindmap->content = $public_mindmap->content;
+            $mindmap->user_id = TSession::getValue('userid');
+            $mindmap->folder_id = $params['folder_id']; ;
+            $mindmap->store();
             
             new TMessage('info', 'Mapa copiado com sucesso'); 
             TTransaction::close(); // Closes the transaction 

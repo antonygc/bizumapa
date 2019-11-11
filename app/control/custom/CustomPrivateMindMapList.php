@@ -292,7 +292,7 @@ class CustomPrivateMindMapList extends TStandardList
         } 
 
         AdiantiCoreApplication::loadPage($class='MindMapPlugin', $method=NULL,
-            $parameters=['id' => $params['item_id'] ]);            
+            $parameters=['id' => $params['item_id'], 'scope' => 'private']);            
     }
 
 
@@ -399,28 +399,26 @@ class CustomPrivateMindMapList extends TStandardList
     {
         try
         {
-            TTransaction::open('permission'); // abre uma transação
+            TTransaction::open('permission');
 
             if ($params['item_type'] == 'folder') {
-                // CustomPrivateMindMapList::DeleteFolder($params);
                 $object = new CustomFolder($params['item_id']);
             } else {
-                // CustomPrivateMindMapList::DeleteMindMap($params);
                 $object = new CustomPrivateMindMap($params['item_id']);
             }
 
             $object->delete();      
 
-            TTransaction::close(); // fecha a transação.
-
-            new TMessage('info', 'Itens excuídos com sucesso!'); 
-            AdiantiCoreApplication::loadPage(__CLASS__);
-
+            TTransaction::close();
         }
         catch (Exception $e)
         {
             new TMessage('error', $e->getMessage());
+            return;
         }
+
+        new TMessage('info', 'Itens excuídos com sucesso!'); 
+        AdiantiCoreApplication::loadPage(__CLASS__);
 
     }     
 

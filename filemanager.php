@@ -29,6 +29,9 @@ $highlightjs_style = 'vs';
 $default_timezone = 'Europe/Minsk'; // UTC+3
 
 
+$scope = TSession::getValue('userid');
+echo var_dump($scope);
+
 $scope = $_SESSION['bizumapa']['scope'];
 
 // Root path for file manager

@@ -17,41 +17,51 @@ class MindMapPlugin extends TPage
 
         } else {
 
-            AdiantiCoreApplication::loadPage('PrivateMindMap');
+            AdiantiCoreApplication::loadPage('CustomPrivateMindMapList');
         }
     }
 
     function loadUserData()
     {
-        if (isset($_GET))
-        {
 
-            $mappath = isset($_GET['p'])  ? $_GET['p']  : NULL;
-            $mapname = isset($_GET['view']) ? $_GET['view'] : NULL;
+        if (empty($_GET['id']) or 
+            empty($_GET['scope'])) {
+            return false;
+        } 
 
-            $full_path = MindMapUtils::getMindMapFullPath($mappath, $mapname);
+        $id = (int) $_GET['id'];
+        $scope = $_GET['scope'];
 
-            $mapcontent = file_get_contents($full_path);
-
-            if ($mapcontent) {
-                $this->loadMindMap($mappath, $mapname, $mapcontent);
-                return true;
-            }
-
-            new TMessage('error', 'Erro ao recuperar Mapa Mental');
+        if ($scope == 'public') {
+            $model = 'CustomPublicMindMap';
+        } elseif ($scope == 'private') {
+            $model = 'CustomPrivateMindMap';
+        } else {
             return false;
         }
-    }
+        
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
 
+            $mindmap = new $model($id); 
+    
+            TTransaction::close(); // Closes the transaction 
 
-    function loadMindMap($mappath, $mapname, $mapcontent)
-    {
-        echo "<script>
-            var mindmap_path = '". $mappath ."';
-            var mindmap_name = '". $mapname ."';
-            var mindmap_content = '". $mapcontent ."';
-            </script>";
-    }
+            $script = "<script>
+                var mindmap_content = '". $mindmap->content ."';
+                </script>";
+
+            echo $script;
+            return true;
+        } 
+        catch (Exception $e) 
+        { 
+            new TMessage('error', $e->getMessage()); 
+            return false;
+        }    
+    }    
+
 
     function includePluginCSS()
     {
