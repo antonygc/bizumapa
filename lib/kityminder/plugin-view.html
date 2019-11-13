@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="lib/kityminder/src/kityminder.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #minder-view {
+            position: absolute;
+            /*border: 1px solid #ccc;*/
+            left: 0px;
+            top: 0px;
+            bottom: 0px;
+            right: 0px;
+        }
+    </style>
+</head>
+<body>
+    <script id="minder-view" type="application/kityminder" minder-data-type="json">
+
+    {MINDMAP_CONTENT}
+
+    </script>
+}
+</body>
+<script type="text/javascript" src="lib/kityminder/bower_components/kity/dist/kity.min.js"></script>
+<script type="text/javascript" src="lib/kityminder/dist/kityminder.core.min.js"></script>
+<script type="text/javascript">
+(function(){
+    var km = window.km = new kityminder.Minder();
+    km.setup('#minder-view');
+    km.disable();
+    km.execCommand('hand');
+})();
+</script>
+</html>

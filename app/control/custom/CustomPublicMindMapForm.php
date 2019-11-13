@@ -40,7 +40,7 @@ class CustomPublicMindMapForm extends TPage
         $btn = $this->form->addAction( _t('Save'), new TAction(array($this, 'onSave')), 'fa:floppy-o' );
         $btn->class = 'btn btn-sm btn-primary';
         
-        $this->form->addAction( _t('Clear'), new TAction(array($this, 'onEdit')),  'fa:eraser red' );
+        $this->form->addAction( _t('Clear'), new TAction(array($this, 'onConfigure')),  'fa:eraser red' );
         $this->form->addAction( _t('Back'), new TAction(array('CustomPublicMindMapList','onReload')),  'fa:arrow-circle-o-left blue' );
 
         $container = new TVBox;
@@ -91,10 +91,10 @@ class CustomPublicMindMapForm extends TPage
     }
     
     /**
-     * method onEdit()
+     * method onConfigure()
      * Executed whenever the user clicks at the edit button da datagrid
      */
-    function onEdit($param)
+    function onConfigure($param)
     {
         try
         {

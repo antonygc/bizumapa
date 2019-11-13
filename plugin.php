@@ -10,17 +10,8 @@ class PluginRenderer
 		session_id($_COOKIE['PHPSESSID']);
 		session_start();
 
-		switch($_SERVER['REQUEST_METHOD'])
-		{
-			case 'GET': 
-				$this->request = $_GET; 
-				break;
-			case 'POST': 
-				$this->request = $_POST; 
-				break;
-			default:
-				$this->request = []; 
-		}
+
+		$this->request = $_REQUEST; 
 
 		if (empty($this->request['id']) or empty($this->request['scope'])) {
 			$this->die();
@@ -33,12 +24,23 @@ class PluginRenderer
 		$id = (int) $_GET['id'];
 
 		$model = $this->getModel();
-
 		$mindmap = $this->loadMindMap($id, $model);
 
-		if ($mindmap->user_id != TSession::getValue('userid')) {
-		 	$this->die();
-		}
+		$permission = 'EDIT';
+
+		if ($this->request['scope'] == 'public') {
+
+			if (!CustomAppUtils::isAdmin()) {
+				$permission = 'VIEW';
+			} 
+
+		} else {
+
+			if ($mindmap->user_id != TSession::getValue('userid')) {
+			 	$this->die();
+			}
+
+		} 
 
 		$this->RenderPlugin($mindmap);
 
@@ -77,22 +79,45 @@ class PluginRenderer
 
 	public function RenderPlugin($mindmap)
 	{
-		$content = str_replace(
-			'{MINDMAP_CONTENT}', 
-			json_encode($mindmap->content), 
-			file_get_contents("lib/kityminder/plugin.html"));
 
-		$content = str_replace(
-			'{MINDMAP_ID}', 
-			json_encode($mindmap->id), 
-			$content);
+		$old = ['{SCOPE}',
+				'{MINDMAP_ID}',
+				'{MINDMAP_CONTENT}'];
 
-		$content = str_replace(
-			'{SCOPE}', 
-			$this->request['scope'], 
-			$content);
+		$new = [$this->request['scope'],
+				json_encode($mindmap->id), 
+				json_encode($mindmap->content)];
+
+		$content = str_replace( $old, $new, file_get_contents("lib/kityminder/plugin-edit.html"));
 
 		echo $content;
+	}
+
+	public function view()
+	{
+
+		$id = (int) $this->request['id'];
+		$model = $this->getModel();
+
+		try 
+		{ 
+		    TTransaction::open('permission');
+		    $mindmap = new $model($id); 
+		    TTransaction::close();  
+ 		} 
+
+		catch (Exception $e) 
+		{ 
+		    new TMessage('error', $e->getMessage()); 
+		    die($e->getMessage());
+		} 
+
+		echo str_replace(
+			'{MINDMAP_CONTENT}', 
+			$mindmap->content, 
+			file_get_contents("lib/kityminder/plugin-view.html"));
+
+		exit();
 	}
 
 	public function store()
@@ -103,11 +128,11 @@ class PluginRenderer
 
 		try 
 		{ 
-		    TTransaction::open('permission'); // open transaction 
+		    TTransaction::open('permission');
 		    $mindmap = new $model($id); 
 		    $mindmap->content = $data;
 		    $mindmap->store();
-		    TTransaction::close(); // Closes the transaction 
+		    TTransaction::close();  
  		} 
 
 		catch (Exception $e) 

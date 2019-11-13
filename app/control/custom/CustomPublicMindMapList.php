@@ -78,7 +78,7 @@ class CustomPublicMindMapList extends TStandardList
         $btn->class = 'btn btn-sm btn-primary';
 
         if (in_array('1', TSession::getValue('usergroupids'))) {
-        $this->form->addAction('Novo Mapa Público',  new TAction(array('CustomPublicMindMapForm', 'onEdit')), 'bs:plus-sign green');
+        $this->form->addAction('Novo Mapa Público',  new TAction(array('CustomPublicMindMapForm', 'onConfigure')), 'bs:plus-sign green');
         }
     }
 
@@ -131,9 +131,25 @@ class CustomPublicMindMapList extends TStandardList
     public function createActions()
     {
 
+
+        $action_view = new TDataGridAction(array($this, 'onView'));
+        $action_view->setButtonClass('btn btn-default');
+        $action_view->setLabel('Ver');
+        $action_view->setImage('fa:eye blue fa-lg');
+        $action_view->setField('id');
+        $this->datagrid->addAction($action_view);
+
         if (in_array('1', TSession::getValue('usergroupids'))) {
             // user is admin
-            $action_edit = new TDataGridAction(array('CustomPublicMindMapForm', 'onEdit'));
+
+            $action_config = new TDataGridAction(array('CustomPublicMindMapForm', 'onConfigure'));
+            $action_config->setButtonClass('btn btn-default');
+            $action_config->setLabel('Configurar');
+            $action_config->setImage('fa:gear blue fa-lg');
+            $action_config->setField('id');
+            $this->datagrid->addAction($action_config);
+
+            $action_edit = new TDataGridAction(array($this, 'onEdit'));
             $action_edit->setButtonClass('btn btn-default');
             $action_edit->setLabel(_t('Edit'));
             $action_edit->setImage('fa:pencil-square-o blue fa-lg');
@@ -149,7 +165,7 @@ class CustomPublicMindMapList extends TStandardList
             $this->datagrid->addAction($action_del);
         } else {
 
-            $action_copy = new TDataGridAction(array('CustomPublicMindMapList', 'onCopy'));
+            $action_copy = new TDataGridAction(array($this, 'onCopy'));
             $action_copy->setButtonClass('btn btn-default');
             $action_copy->setLabel('Copiar para Meus Mapas');
             $action_copy->setImage('fa:copy blue fa-lg');
@@ -184,6 +200,23 @@ class CustomPublicMindMapList extends TStandardList
         }
     }    
 
+    public function onView($params)
+    {
+        // Abre na mesma aba
+        AdiantiCoreApplication::loadPage($class='MindMapPlugin', $method='view',
+        // Abre em outra aba
+        // AdiantiCoreApplication::openPage($class='MindMapPlugin', $method=NULL,
+            $parameters=['id' => $params['id'], 'scope' => 'public']); 
+    }
+
+    public function onEdit($params)
+    {
+        // Abre na mesma aba
+        AdiantiCoreApplication::loadPage($class='MindMapPlugin', $method=NULL,
+        // Abre em outra aba
+        // AdiantiCoreApplication::openPage($class='MindMapPlugin', $method=NULL,
+            $parameters=['id' => $params['id'], 'scope' => 'public']); 
+    }
 
     public function onCopy($params)
     {

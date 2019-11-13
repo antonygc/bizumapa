@@ -8,20 +8,10 @@ class MindMapPlugin extends TPage
 
         parent::__construct();
 
-        if (empty($_GET['id']) or 
-            empty($_GET['scope'])) {
-            return false;
-        } 
-
-        $data = array('id'=> $_GET['id'],
-              'scope'=>$_GET['scope']);
-
-        $query = http_build_query($data); // foo=bar&baz=boom&cow=milk&php=hypertext+processor
-
         $iframe = new TElement('iframe');
-        $iframe->src = "plugin.php?" . $query;
+        $iframe->src = "plugin.php?" . http_build_query($_REQUEST);;
         $iframe->frameborder = "0";
-        $iframe->scrolling = "auto";
+        $iframe->scrolling = "no";
         $iframe->width = "100%";
         $iframe->height = "700px";
         

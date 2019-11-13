@@ -16,23 +16,6 @@
 	<link rel="stylesheet" href="lib/kityminder/kityminder.editor.min.css">
 
 	<style>
-		html, body {
-			margin: 0;
-			padding: 0;
-			height: 100%;
-			overflow: hidden;
-		}
-		h1.editor-title {
-			background: #393F4F;
-			color: white;
-			margin: 0;
-			height: 40px;
-			font-size: 14px;
-			line-height: 40px;
-			font-family: 'Hiragino Sans GB', 'Arial', 'Microsoft Yahei';
-			font-weight: normal;
-			padding: 0 20px;
-		}
 		div.minder-editor-container {
 			position: absolute;
 			top: 0px;
@@ -54,27 +37,25 @@
 <script src="lib/kityminder/bower_components/angular/angular.js"></script>
 <script src="lib/kityminder/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 <script src="lib/kityminder/bower_components/codemirror/lib/codemirror.js"></script>
-<script src="lib/kityminder/bower_components/codemirror/mode/xml/xml.js"></script>
+<!-- <script src="lib/kityminder/bower_components/codemirror/mode/xml/xml.js"></script>
 <script src="lib/kityminder/bower_components/codemirror/mode/javascript/javascript.js"></script>
 <script src="lib/kityminder/bower_components/codemirror/mode/css/css.js"></script>
 <script src="lib/kityminder/bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
 <script src="lib/kityminder/bower_components/codemirror/mode/markdown/markdown.js"></script>
 <script src="lib/kityminder/bower_components/codemirror/addon/mode/overlay.js"></script>
-<script src="lib/kityminder/bower_components/codemirror/mode/gfm/gfm.js"></script>
+<script src="lib/kityminder/bower_components/codemirror/mode/gfm/gfm.js"></script> -->
 <script src="lib/kityminder/bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
 <script src="lib/kityminder/bower_components/marked/lib/marked.js"></script>
 <script src="lib/kityminder/bower_components/kity/dist/kity.min.js"></script>
 <script src="lib/kityminder/bower_components/hotbox/hotbox.js"></script>s
 <script src="lib/kityminder/bower_components/json-diff/json-diff.js"></script>
-<!--<script src="./bower_components/kityminder-core/dist/kityminder.core.min.js"></script>-->
 <script src="lib/kityminder/bower_components/kityminder-core/dist/kityminder.core.min.js"></script>
 <script src="lib/kityminder/bower_components/color-picker/dist/color-picker.min.js"></script>
 <!-- endbower -->
 
 <script src="lib/kityminder/kityminder.editor.js"></script>
-<!-- <script src="lib/kityminder/diy.js"></script> -->
-<script>
-	
+
+<script>	
 (function(){
 
 	angular.module('kityminderDemo', ['kityminderEditor'])
@@ -97,7 +78,7 @@
 					'data': JSON.stringify(editor.minder.exportJson())
 				}
 
-				$.post( "plugin.php", post_data, function( data ) {
+				$.post("plugin.php", post_data, function( data ) {
   					console.log(data);
 				});
 
@@ -106,8 +87,6 @@
 	});
 
 })();
-
-
 </script>
 
 

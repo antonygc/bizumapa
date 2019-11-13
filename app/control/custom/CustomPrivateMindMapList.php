@@ -114,14 +114,25 @@ class CustomPrivateMindMapList extends TStandardList
         $action_view->setField('parent_id');
 
         // create EDIT action
-        $action_edit = new TDataGridAction(array($this, 'onEditItem'));
+        $action_edit = new TDataGridAction(array($this, 'onEditMindMap'));
         $action_edit->setButtonClass('btn btn-default');
-        $action_edit->setLabel('Renomear');
-        $action_edit->setImage('fa:pencil-square-o blue fa-lg');
+        $action_edit->setLabel('Editar');
+        $action_edit->setImage('fa:sitemap fa-rotate-270 blue fa-lg');
         $action_edit->setField('item_id');
         $action_edit->setField('item_name');
         $action_edit->setField('item_type');        
         $action_edit->setField('parent_id');
+        $action_edit->setDisplayCondition( array($this, 'isMindMap') );
+
+        // create RENAME action
+        $action_rename = new TDataGridAction(array($this, 'onRenameItem'));
+        $action_rename->setButtonClass('btn btn-default');
+        $action_rename->setLabel('Renomear');
+        $action_rename->setImage('fa:pencil-square-o blue fa-lg');
+        $action_rename->setField('item_id');
+        $action_rename->setField('item_name');
+        $action_rename->setField('item_type');        
+        $action_rename->setField('parent_id');
 
         // create COPY action
         $action_copy = new TDataGridAction(array($this, 'onCopyItem'));
@@ -147,6 +158,7 @@ class CustomPrivateMindMapList extends TStandardList
         $action_group->addHeader('Opções');
         $action_group->addAction($action_view);
         $action_group->addAction($action_edit);
+        $action_group->addAction($action_rename);
         $action_group->addAction($action_copy);
 
         $action_group->addSeparator();
@@ -283,6 +295,14 @@ class CustomPrivateMindMapList extends TStandardList
         AdiantiCoreApplication::loadPage(__CLASS__);
     }
 
+    public function isMindMap($item)
+    {
+        if ($item->item_type == 'mindmap') {
+            return true;
+        }
+        return false;
+    }
+
     public function onViewMindMap($params)
     {
 
@@ -291,12 +311,22 @@ class CustomPrivateMindMapList extends TStandardList
             return;
         } 
 
-        AdiantiCoreApplication::loadPage($class='MindMapPlugin', $method=NULL,
+        AdiantiCoreApplication::openPage($class='MindMapPlugin', $method='view',
             $parameters=['id' => $params['item_id'], 'scope' => 'private']);            
     }
 
+    public function onEditMindMap($params)
+    {
+        if (empty($params['item_id'])) {
+            new TMessage('error', 'Parâmetros inválidos');
+            return;
+        } 
 
-    public function onEditItem($params)
+        AdiantiCoreApplication::openPage($class='MindMapPlugin', $method=NULL,
+            $parameters=['id' => $params['item_id'], 'scope' => 'private']);  
+    }
+
+    public function onRenameItem($params)
     {
         if (empty($params['item_id']) or 
             empty($params['item_name']) or
