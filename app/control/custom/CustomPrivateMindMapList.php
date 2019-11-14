@@ -40,9 +40,9 @@ class CustomPrivateMindMapList extends TStandardList
     {
         $tpl = 
             '<div class="input-group sidebar-form">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar...">
+                <input style="visibility:visible" type="text" name="q" class="form-control" placeholder="Pesquisar...">
                 <span class="input-group-btn">
-                <button type="submit" id="search-btn" name="method" value="customSearch" class="btn btn-flat"><i class="fa fa-search"></i>
+                <button type="submit" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
                 </button>
               </span>
             </div>';
@@ -60,10 +60,18 @@ class CustomPrivateMindMapList extends TStandardList
         parent::setDefaultOrder('item_name', 'asc');         // defines the default order
         // parent::setDefaultOrder('item_type', 'desc');         // defines the default order
 
-        $criteria = new TCriteria;
+        if (empty($_REQUEST['q'])) {
+
+            $criteria = new TCriteria;
+            $criteria->add(new TFilter('parent_id', '=', TSession::getValue('current_folder_id')));
+
+        } else {
+
+            $criteria = $this->customSearch($_REQUEST);
+        }
+
         $user_id = TSession::getValue('userid');
         $criteria->add(new TFilter('user_id', '=', $user_id));
-        $criteria->add(new TFilter('parent_id', '=', TSession::getValue('current_folder_id')));
 
         parent::setCriteria($criteria);
 
@@ -474,7 +482,39 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function customSearch($params)
     {
-        // echo var_dump($params);
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
+
+            $criteria = new TCriteria;
+            $arg = '%' . $params['q'] . '%';
+            $criteria->add(new TFilter('content', 'like', $arg));
+            $user_id = TSession::getValue('userid');
+            $criteria->add(new TFilter('user_id', '=', $user_id));
+
+            $repository = new TRepository('CustomPrivateMindMap'); 
+            $maps = $repository->load($criteria); 
+
+            TTransaction::close(); // Closes the transaction 
+
+            $filter_ids = array();
+
+            foreach ($maps as $map) 
+            { 
+                array_push($filter_ids, $map->id);
+            }
+            
+            $criteria = new TCriteria;
+            $criteria->add(new TFilter('item_id', 'IN', $filter_ids));
+            $criteria->add(new TFilter('item_type', '=', 'mindmap'));
+
+            return $criteria;
+
+        } 
+        catch (Exception $e) 
+        { 
+            new TMessage('error', $e->getMessage()); 
+        }        
     }
 
 }
