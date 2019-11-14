@@ -23,6 +23,7 @@ class CustomPrivateMindMapList extends TStandardList
 
         parent::__construct();
 
+        $this->createSearchButton();
         $this->createDatagrid();
         $this->createPanel();
         
@@ -34,6 +35,23 @@ class CustomPrivateMindMapList extends TStandardList
         parent::add($container);
 
     }
+
+    public function createSearchButton()
+    {
+        $tpl = 
+            '<div class="input-group sidebar-form">
+                <input type="text" name="q" class="form-control" placeholder="Pesquisar...">
+                <span class="input-group-btn">
+                <button type="submit" id="search-btn" name="method" value="customSearch" class="btn btn-flat"><i class="fa fa-search"></i>
+                </button>
+              </span>
+            </div>';
+
+        $this->search_btn = new TPanelGroup('');
+        $this->search_btn->style = 'border-color:#fff';
+        $this->search_btn->add($tpl);
+    }
+
 
     public function createDatagrid()
     {
@@ -179,6 +197,7 @@ class CustomPrivateMindMapList extends TStandardList
         // $this->$btn->class = 'btn btn-sm btn-primary';
         $this->panel->addHeaderAction('Voltar', new TAction(array($this,'onBackAction')), 'fa:arrow-circle-o-left blue' );
 
+        $this->panel->addFields([$this->search_btn]);
         $this->panel->addFields([$this->datagrid]);
         $this->panel->addFields([$this->pageNavigation]);
     }    
@@ -452,39 +471,11 @@ class CustomPrivateMindMapList extends TStandardList
 
     }     
 
+
+    public function customSearch($params)
+    {
+        // echo var_dump($params);
+    }
+
 }
 
-
-        // $this->form = new BootstrapFormBuilder('form_search_CustomPublicMindMap');
-        // $this->form->setFormTitle('Buscar Mapa Mental');
-        
-        // // create the form fields
-        // $id = new TEntry('id');
-        // $name = new TEntry('name');
-        // $filter = new TCriteria;
-        // $filter->add(new TFilter('id', '<', '0'));
-        // $theme_id = new TDBCombo('theme_id', 'permission', 'CustomTheme', 'id', 'name', 'name');
-        // $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name', $filter);
-        
-        // // add the fields
-        // $this->form->addFields( [new TLabel('ID')], [$id] );
-        // $this->form->addFields( [new TLabel('Mapa')], [$name] );
-        // $this->form->addFields( [new TLabel('Matéria')], [$theme_id] );
-        // $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id] );
-
-        // $id->setSize('30%');
-        // $name->setSize('70%');
-        // $theme_id->setSize('70%');
-        // $subject_matter_id->setSize('70%');
-
-        // $theme_id->enableSearch();
-        // $theme_id->setChangeAction( new TAction( array($this, 'onThemeChange' )) );
-        // $subject_matter_id->enableSearch();
-        
-        // // keep the form filled during navigation with session data
-        // $this->form->setData( TSession::getValue('CustomPublicMindMap_filter_data') );
-        
-        // // add the search form actions
-        // $btn = $this->form->addAction(_t('Find'), new TAction(array($this, 'onSearch')), 'fa:search');
-        // $btn->class = 'btn btn-sm btn-primary';
-        // $this->form->addAction('Novo Mapa Público',  new TAction(array('CustomPublicMindMapForm', 'onEdit')), 'bs:plus-sign green');
