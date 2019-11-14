@@ -38,14 +38,15 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function createSearchButton()
     {
-        $tpl = 
-            '<div class="input-group sidebar-form">
+        $tpl = '<form action="#" method="post">
+            <div class="input-group sidebar-form">
                 <input style="visibility:visible" type="text" name="q" class="form-control" placeholder="Pesquisar...">
                 <span class="input-group-btn">
                 <button type="submit" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
                 </button>
               </span>
-            </div>';
+            </div>
+            </form>';
 
         $this->search_btn = new TPanelGroup('');
         $this->search_btn->style = 'border-color:#fff';
@@ -58,27 +59,29 @@ class CustomPrivateMindMapList extends TStandardList
         parent::setDatabase('permission');            // defines the database
         parent::setActiveRecord('ViewFolderContents');   // defines the active record
         parent::setDefaultOrder('item_name', 'asc');         // defines the default order
-        // parent::setDefaultOrder('item_type', 'desc');         // defines the default order
+
+        $user_id = TSession::getValue('userid');
+
+        $criteria = new TCriteria;
 
         if (empty($_REQUEST['q'])) {
-
-            $criteria = new TCriteria;
             $criteria->add(new TFilter('parent_id', '=', TSession::getValue('current_folder_id')));
 
         } else {
+            $q = $_REQUEST['q'];
+            $subsel = "(SELECT id FROM custom_private_mind_map 
+                WHERE user_id='$user_id' and content LIKE '%$q%')";
 
-            $criteria = $this->customSearch($_REQUEST);
+            $criteria->add(new TFilter('item_id', 'IN', $subsel));
+            // $_REQUEST = [$_REQUEST['q'], $_REQUEST['class']];
+            // $criteria = $this->customSearch($_REQUEST);
+            $criteria->add(new TFilter('item_type', '=', 'mindmap'));
+
         }
 
-        $user_id = TSession::getValue('userid');
         $criteria->add(new TFilter('user_id', '=', $user_id));
 
         parent::setCriteria($criteria);
-
-        // parent::addFilterField('id', '=', 'id'); // filterField, operator, formField
-        // parent::addFilterField('name', 'like', 'name'); // filterField, operator, formField
-        // parent::addFilterField('theme_id', '=', 'theme_id'); // filterField, operator, formField
-        // parent::addFilterField('subject_matter_id', '=', 'subject_matter_id'); // filterField, operator, formField
 
         // creates a DataGrid
         // TScript::create('$("#my_table tr:eq(0) th:eq(0)").text("My Text");');
@@ -479,43 +482,6 @@ class CustomPrivateMindMapList extends TStandardList
 
     }     
 
-
-    public function customSearch($params)
-    {
-        try 
-        { 
-            TTransaction::open('permission'); // open transaction 
-
-            $criteria = new TCriteria;
-            $arg = '%' . $params['q'] . '%';
-            $criteria->add(new TFilter('content', 'like', $arg));
-            $user_id = TSession::getValue('userid');
-            $criteria->add(new TFilter('user_id', '=', $user_id));
-
-            $repository = new TRepository('CustomPrivateMindMap'); 
-            $maps = $repository->load($criteria); 
-
-            TTransaction::close(); // Closes the transaction 
-
-            $filter_ids = array();
-
-            foreach ($maps as $map) 
-            { 
-                array_push($filter_ids, $map->id);
-            }
-            
-            $criteria = new TCriteria;
-            $criteria->add(new TFilter('item_id', 'IN', $filter_ids));
-            $criteria->add(new TFilter('item_type', '=', 'mindmap'));
-
-            return $criteria;
-
-        } 
-        catch (Exception $e) 
-        { 
-            new TMessage('error', $e->getMessage()); 
-        }        
-    }
 
 }
 
