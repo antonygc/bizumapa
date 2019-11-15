@@ -38,15 +38,20 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function createSearchButton()
     {
-        $tpl = '<form action="#" method="post">
+
+        $q = (!empty($_REQUEST['q'])) ? $_REQUEST['q'] : TSession::getValue('q') ;
+
+        $tpl = '
             <div class="input-group sidebar-form">
-                <input style="visibility:visible" type="text" name="q" class="form-control" placeholder="Pesquisar...">
+                <input type="text" name="q" value="'. $q .'" class="form-control" placeholder="Pesquisar...">
                 <span class="input-group-btn">
-                <button type="submit" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-            </div>
-            </form>';
+                    <!-- Previne abrir janela com mapa selecionado anteriormente -->
+                    <input type="hidden" name="method" value="">
+                    <button type="submit" id="search-btn" class="btn btn-flat">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>';
 
         $this->search_btn = new TPanelGroup('');
         $this->search_btn->style = 'border-color:#fff';
@@ -64,19 +69,29 @@ class CustomPrivateMindMapList extends TStandardList
 
         $criteria = new TCriteria;
 
-        if (empty($_REQUEST['q'])) {
-            $criteria->add(new TFilter('parent_id', '=', TSession::getValue('current_folder_id')));
-
-        } else {
-            $q = $_REQUEST['q'];
+        function add_criteria($criteria, $user_id, $q)
+        {            
             $subsel = "(SELECT id FROM custom_private_mind_map 
                 WHERE user_id='$user_id' and content LIKE '%$q%')";
-
             $criteria->add(new TFilter('item_id', 'IN', $subsel));
-            // $_REQUEST = [$_REQUEST['q'], $_REQUEST['class']];
-            // $criteria = $this->customSearch($_REQUEST);
             $criteria->add(new TFilter('item_type', '=', 'mindmap'));
+        }
 
+        if (empty($_REQUEST['q'])) {
+
+            if (empty(TSession::getValue('q'))) {
+                
+                $criteria->add(new TFilter('parent_id', '=', TSession::getValue('current_folder_id')));
+
+            } else {
+
+                add_criteria($criteria, $user_id, TSession::getValue('q'));
+            }
+
+        } else {
+
+            TSession::setValue('q', $_REQUEST['q']);
+            add_criteria($criteria, $user_id, TSession::getValue('q'));
         }
 
         $criteria->add(new TFilter('user_id', '=', $user_id));
@@ -216,10 +231,13 @@ class CustomPrivateMindMapList extends TStandardList
     public function onBackAction($params)
     {
 
+        TSession::setValue('q', null);  
+
         $curr_parent_id = TSession::getValue('current_folder_parent_id');  
 
         if (!$curr_parent_id){
             // Já está na raiz
+            AdiantiCoreApplication::loadPage(__CLASS__);
             return;
         }
 
