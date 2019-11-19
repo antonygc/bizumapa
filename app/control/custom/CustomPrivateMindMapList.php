@@ -15,52 +15,6 @@ class CustomPrivateMindMapList extends TStandardList
     public function __construct()
     {
 
-
-        $pagarme = new PagarMe\Client('ak_test_tyzdxe39mTDFsC0Bfdwlx3hYafC5TH');
-
-
-        echo '<form method="POST" action="/comprar">
-            <script type="text/javascript"
-                src="https://assets.pagar.me/checkout/checkout.js"
-                data-encryption-key="ak_test_tyzdxe39mTDFsC0Bfdwlx3hYafC5TH"
-                data-customer-data="true"
-                data-create-token="true"
-                data-amount="1000">
-            </script>
-        </form>';
-
-        
-        // $transaction = $pagarme->transactions()->create([
-        //   'amount' => 1000,
-        //   'payment_method' => 'boleto',
-        //   'async' => false,
-        //   'customer' => [
-        //     'external_id' => '15',
-        //     'name' => 'Nome do cliente',
-        //     'type' => 'individual',
-        //     'country' => 'br',
-        //     'documents' => [
-        //       [
-        //         'type' => 'cpf',
-        //         'number' => '00000000000'
-        //       ]
-        //     ],
-        //     'phone_numbers' => [ '+551199999999' ],
-        //     'email' => 'cliente@email.com'
-        //   ]
-        // ]);
-
-
-        // $plan = $pagarme->plans()->create([
-        //   'amount' => '15000',
-        //   'days' => '30',
-        //   'name' => 'The Pro Plan - Platinum - Best ever'
-        // ]);
-
-        // echo var_dump($plan);
-
-
-
         if (TSession::getValue('current_folder_id') == NULL) {
             TSession::setValue('current_folder_id', '1');        
             TSession::setValue('current_folder_name', 'Minhas Pastas');        

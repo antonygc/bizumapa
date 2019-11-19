@@ -2,13 +2,18 @@
 <menu>
 
   <menuitem label="Mapas Públicos">
-    <icon>fa:globe fa:fw</icon>
+    <icon>fa:globe fa:fw fa-lg</icon>
     <action>CustomPublicMindMapList</action>
   </menuitem>
 
   <menuitem label="Meus Mapas">
-    <icon>fa:sitemap fa-rotate-270 fa:fw</icon>
+    <icon>fa:sitemap fa-rotate-270 fa:fw fa-lg</icon>
     <action>CustomPrivateMindMapList</action>
+  </menuitem>
+
+  <menuitem label="Assinatura">
+    <icon>fa:shopping-cart fa:fw fa-lg</icon>
+    <action>CustomSubscription</action>
   </menuitem>
 
   <menuitem label="Classificação">
