@@ -1,60 +1,267 @@
 
 <!--[main]-->
 <html>
-  <head>
-    <!-- SCRIPT PAGAR.ME -->
-    <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
-  </head>
-  <body>
-    <button id="pay-button">Abrir modal de pagamento</button>
+   <!-- https://speckyboy.com/css-responsive-pricing-table/ -->
+   <!-- https://www.froala.com/online-html-editor -->
+   <head>
+      <!-- SCRIPT PAGAR.ME -->
+      <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+      <style type="text/css">
+         @import url(https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css);
+         @import url(https://fonts.googleapis.com/css?family=Raleway:400,500,800);
+         @import url(https://fonts.googleapis.com/css?family=Montserrat:800);
+         .snip1214 {
+         font-family: 'Raleway', Arial, sans-serif;
+         color: #000000;
+         text-align: center;
+         font-size: 16px;
+         width: 100%;
+         max-width: 1000px;
+         margin: 40px 10px;
+         }
+         .snip1214 .plan {
+         margin: 20px;
+         width: 30%;
+         position: relative;
+         float: left;
+         background-color: #ffffff;
+         border: 1px solid rgba(0, 0, 0, 0.1);
+         }
+         .snip1214 * {
+         -webkit-box-sizing: border-box;
+         box-sizing: border-box;
+         }
+         .snip1214 header {
+         position: relative;
+         }
+         .snip1214 .plan-title {
+         position: relative;
+         top: 0;
+         font-weight: 800;
+         padding: 5px 15px;
+         margin: 0 auto;
+         -webkit-transform: translateY(-50%);
+         transform: translateY(-50%);
+         margin: 0;
+         display: inline-block;
+         background-color: #222f3d;
+         color: #ffffff;
+         text-transform: uppercase;
+         }
+         .snip1214 .plan-cost {
+         padding: 0px 10px 20px;
+         }
+         .snip1214 .plan-price {
+         font-family: 'Montserrat', Arial, sans-serif;
+         font-weight: 800;
+         font-size: 2.4em;
+         color: #6aae5c;
+         }
+         .snip1214 .plan-type {
+         opacity: 0.6;
+         }
+         .snip1214 .plan-features {
+         padding: 0;
+         margin: 0;
+         text-align: center;
+         list-style: outside none none;
+         font-size: 0.8em;
+         }
+         .snip1214 .plan-features li {
+         border-top: 1px solid #d2d7e2;
+         padding: 10px 5%;
+         }
+         .snip1214 .plan-features li:nth-child(even) {
+         background: rgba(0, 0, 0, 0.08);
+         }
+         .snip1214 .plan-features i {
+         margin-right: 8px;
+         opacity: 0.4;
+         }
+         .snip1214 .plan-select {
+         border-top: 1px solid #d2d7e2;
+         padding: 10px 10px 0;
+         }
+         .snip1214 .plan-select a {
+         background-color: #222f3d;
+         color: #ffffff;
+         text-decoration: none;
+         padding: 0.5em 1em;
+         -webkit-transform: translateY(50%);
+         transform: translateY(50%);
+         font-weight: 800;
+         text-transform: uppercase;
+         display: inline-block;
+         }
+         .snip1214 .plan-select a:hover {
+         background-color: #46627f;
+         }
+         .snip1214 .featured {
+         margin-top: -10px;
+         background-color: #34495e;
+         color: #ffffff;
+         box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+         z-index: 1;
+         }
+         .snip1214 .featured .plan-title{
+         color: #ffffff;
+         }
+         .snip1214 .featured .plan-price {
+         color: #85cc76;
+         }
+         .snip1214 .featured .plan-cost {
+         padding: 10px 10px 20px;
+         }
+         .snip1214 .featured .plan-features li {
+         border-top: 1px solid rgba(255, 255, 255, 0.4);
+         }
+         .snip1214 .featured .plan-select {
+         padding: 20px 10px 0;
+         border-top: 1px solid rgba(255, 255, 255, 0.4);
+         }
+         @media only screen and (max-width: 767px) {
+         .snip1214 .plan {
+         width: 50%;
+         }
+         .snip1214 .plan-title,
+         .snip1214 .plan-select a {
+         -webkit-transform: translateY(0);
+         transform: translateY(0);
+         }
+         .snip1214 .plan-cost,
+         .snip1214 .featured .plan-cost {
+         padding: 20px 10px 20px;
+         }
+         .snip1214 .plan-select,
+         .snip1214 .featured .plan-select {
+         padding: 10px 10px 10px;
+         }
+         .snip1214 .featured {
+         margin-top: 0;
+         }
+         }
+         @media only screen and (max-width: 440px) {
+         .snip1214 .plan {
+         width: 100%;
+         }
+         }
 
-    <script>
-    var button = document.querySelector('button');
 
-    // Abrir o modal ao clicar no botão
-    button.addEventListener('click', function() {
-
-      // inicia a instância do checkout
-      var checkout = new PagarMeCheckout.Checkout({
-        encryption_key: 'SUA ENCRYPTION KEY',
-        success: function(data) {
-          console.log(data);
-        },
-        error: function(err) {
-        	console.log(err);
-        },
-        close: function() {
-        	console.log('The modal has been closed.');
+        .bgimg {
+        background-image: url('https://www.freepik.com/free-vector/vector-blue-wave-transparent_5288609.htm#page=1&query=free%20png%20background&position=19');
+        /*background-repeat: no-repeat;*/
+        text-align: left;
         }
-      });
 
-      // Obs.: é necessário passar os valores boolean como string
-      checkout.open({
-        amount: 8000,
-        buttonText: 'Pagar',
-        buttonClass: 'botao-pagamento',
-        customerData: 'false',
-        createToken: 'true',
-        paymentMethods: 'credit_card',
-        customer: {
-          external_id: '#123456789',
-          name: 'Fulano',
-          type: 'individual',
-          country: 'br',
-          email: 'fulano@email.com',
-          documents: [
-            {
-              type: 'cpf',
-              number: '71404665560',
-            },
-          ],
-          phone_numbers: ['+5511999998888', '+5511888889999'],
-          birthday: '1985-01-01'
-        }
-      });
-    });
-    </script>
-  </body>
+
+      </style>
+   </head>
+   <body>
+      <!-- <button id="pay-button">Abrir modal de pagamento</button> -->
+      <div class="snip1214">
+         <div class="plan">
+            <h3 class="plan-title">
+               Assinatura única
+            </h3>
+            <div class="plan-cost"><span class="plan-price">R$ 29,90</span><span class="plan-type">/ Mês</span></div>
+            <ul class="plan-features">
+               <li><i class="ion-checkmark green"> </i><strong>Pesquisar</strong> por conteúdo</li>
+               <li><i class="ion-checkmark green"> </i><strong>Organizar</strong> em pastas</li>
+               <li><i class="ion-checkmark green"> </i><strong>Editar</strong> como quiser</li>
+               <li><i class="ion-checkmark green"> </i>250Gb Monthly Transfer</li>
+               <li><i class="ion-checkmark green"> </i>24/7 Tech Support</li>
+               <li><i class="ion-checkmark green"> </i>Daily Backups</li>
+            </ul>
+            <div class="plan-select">
+                <a href="" onclick="return custom_checkout();">Assinar  </a>
+            </div>
+
+
+
+         </div>
+
+
+        <div class="bgimg">
+
+<h2>Cancele <span style="color: rgb(65, 168, 95);"><strong>quando quiser</strong><strong>.</strong></span></h2>
+<p>N&atilde;o era o que procurava? Cancele sua assinatura em um clique.</p>
+<p><br></p>
+<h2><span style="color: rgb(0, 0, 0);">Todo o poder dos mapas mentais&nbsp;</span><span style="color: rgb(65, 168, 95);"><strong>em um s&oacute; lugar.</strong><br></span></h2>
+<p>A<span style="color: rgb(0, 0, 0);">&nbsp;&uacute;nica ferramenta do mercado especializada em mapas mentais para concursos.</span></p>
+<p><br></p>
+<h2>Chega de <span style="color: rgb(209, 72, 65);"><strong>perder tempo&nbsp;</strong></span><span style="color: rgb(0, 0, 0);">com conte&uacute;do in&uacute;til.</span></h2>
+<p>Selecione, organize, edite e pesquise apenas o que é do seu interesse.</p>
+
+
+        </div>
+
+
+      </div>
+      <script>  
+         
+         function custom_checkout(){
+
+           var checkout = new PagarMeCheckout.Checkout({
+             encryption_key: 'ek_test_MEbTdqHyayL1RUtXFhctuQuQWbUABQ',
+
+             success: function(data) {
+
+                //TODO NÃO VAI O GET DE JEITO NENHUM
+                var form = $(
+                    '<form action="' + window.location + '" method="POST">' +
+                        '<input id="form-data" type="text" name="data">' +
+                    '</form>');
+                $('body').append(form);
+                $('#form-data').val(JSON.stringify(data));
+
+                form.submit();
+
+             },
+             error: function(err) {
+                console.log(err);
+             },
+             close: function() {
+                console.log('The modal has been closed.');
+             }
+            });      
+
+            checkout.open({
+                amount: 2990,
+                buttonText: 'Pagar',
+                buttonClass: 'botao-pagamento',
+                customerData: 'true',
+                createToken: 'false',
+             // paymentMethods: 'credit_card',
+                items: [{
+                    id: '1',
+                    title: 'ASSINATURA ÚNICA',
+                    unit_price: 2990,
+                    quantity: 1,
+                    tangible: false }],
+
+             customer: {
+               external_id: '#123456789',
+               name: 'Fulano',
+               type: 'individual',
+               country: 'br',
+               email: 'fulano@email.com',
+               documents: [
+                 {
+                   type: 'cpf',
+                   number: '71404665560',
+                 },
+               ],
+               phone_numbers: ['+5511999998888', '+5511888889999'],
+               birthday: '1985-01-01'
+             }
+           });
+
+           return false;
+
+         };
+     
+      </script>
+   </body>
 </html>
-
 <!--[/main]-->
+

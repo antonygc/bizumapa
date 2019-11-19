@@ -120,6 +120,6 @@
 
       <menuitem label="Logout">
         <action>LoginForm#method=onLogout#static=1</action>
-        <icon>fa:sign-out fa-fw</icon>
+        <icon>fa:sign-out fa-fw fa-lg</icon>
       </menuitem>
 </menu>
