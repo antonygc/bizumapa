@@ -11,6 +11,7 @@ class CustomSubscription extends TPage
 {
 	
 	protected $pagarme;
+	protected $form;
 
 
 	function __construct()
@@ -31,26 +32,8 @@ class CustomSubscription extends TPage
        	$subs = $this->getSubscriptionObj($id);
 
        	if ($subs) {
-       		// echo var_dump($subs);
-	        // $this->html = new THtmlRenderer('app/resources/custom_sub_status.html');
 
-			//   public 'current_period_start' => string '2019-11-19T22:02:16.050Z' (length=24)
-			//   public 'current_period_end' => string '2019-12-19T22:02:16.050Z' (length=24)
-       		//   public 'status' => string 'paid' (length=4)
-       		//   public 'payment_method' => string 'credit_card' (length=11)
-
-			$iframe = new TElement('iframe');
-	        $iframe->src = $subs->manage_url;
-	        $iframe->frameborder = "0";
-	        $iframe->scrolling = "no";
-	        $iframe->width = "100%";
-	        $iframe->height = "700px";
-	        
-	        $vbox = new TVBox;
-	        $vbox->style = 'width: 100%';
-	        $vbox->add($iframe);
-	        $this->html = $vbox;
-
+	        $this->html = $this->getSubscriptionStatusForm($subs);
 
        	} else {
 	        $this->html = new THtmlRenderer('app/resources/custom_checkout.html');
@@ -152,6 +135,81 @@ class CustomSubscription extends TPage
 	        }
 	    }
 	    return $a;
+	}
+
+	public function getSubscriptionStatusForm($subs)
+	{
+
+        $form = new BootstrapFormBuilder;
+        $form->setFormTitle('Assinatura');
+        
+        // create the form fields
+        $id          = new TEntry('id');
+        $status 	 = new TEntry('status');
+        $plan    	 = new TEntry('plan');
+        $created     = new TDateTime('created');
+        $expires     = new TDateTime('expires');
+        $value       = new TEntry('value');
+        $paymethod   = new TEntry('paymethod');
+        $pagarmebtn  = new THyperLink('pagar.me', $subs->manage_url, 'white', 10, '', 'fa:external-link white');
+        $pagarmebtn->class='btn btn-success';
+        
+        $id->setEditable(FALSE);
+        $status->setEditable(FALSE);
+        $plan->setEditable(FALSE);
+        $created->setEditable(FALSE);
+        $expires->setEditable(FALSE);
+        $value->setEditable(FALSE);
+        $paymethod->setEditable(FALSE);
+
+        $id->setSize('38%');
+        // $plan->setSize('38%');
+        // $status->setSize('38%');
+        $created->setMask('dd/mm/yyyy hh:ii');
+        $expires->setMask('dd/mm/yyyy hh:ii');
+        $created->setDatabaseMask('yyyy-mm-dd hh:ii');
+        $expires->setDatabaseMask('yyyy-mm-dd hh:ii');
+        $value->setNumericMask(2, ',', '.', true);
+        $value->setSize('100%');
+        $paymethod->setSize('100%');
+        $created->setSize('100%');
+        $expires->setSize('100%');
+
+        $id->setValue($subs->id);
+        $status->setValue($subs->status);
+        $plan->setValue($subs->plan->name);
+        $created->setValue($subs->current_period_start);
+        $expires->setValue($subs->current_period_end);
+        $value->setValue($subs->plan->amount/100);
+        $paymethod->setValue($subs->payment_method);
+
+        $label_style = 'text-align:left;border-bottom:1px solid #c0c0c0;width:100%';
+
+		$label = new TLabel('Identificação', '', 12, 'i');
+        $label->style= $label_style;
+        $form->addContent( [$label] );
+
+        $form->addFields( [new TLabel('Número')],      [$id]);
+        $form->addFields( [new TLabel('Plano')],   	   [$plan] );
+        $form->addFields( [new TLabel('Forma de Pagamento')], [$paymethod],
+    					  [new TLabel('Valor (R$)')],  [$value]);
+
+		$label = new TLabel('Situação', '', 12, 'i');
+        $label->style= $label_style;
+        $form->addContent( [$label] );
+
+        $form->addFields( [new TLabel('Status')], 	   [$status] );
+        $form->addFields( [new TLabel('Início em')],  [$created], 
+                          [new TLabel('Expira em')],  [$expires]);
+        
+        $label = new TLabel('Alterações e Cancelamento', '', 12, 'i');
+        $label->style= $label_style;
+        $form->addContent( [$label] );
+        
+        $form->addFields( [new TLabel('Acesse o link externo')], [$pagarmebtn] );
+ 
+        return $form;
+        
 	}
 
 
