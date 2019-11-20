@@ -22,6 +22,7 @@ CREATE TABLE system_user (
     login varchar(100),
     password varchar(100),
     email varchar(100),
+    subscription varchar(100),
     frontpage_id int, system_unit_id int references system_unit(id), active char(1),
     FOREIGN KEY(frontpage_id) REFERENCES system_program(id));
     

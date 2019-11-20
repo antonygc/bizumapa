@@ -19,101 +19,126 @@ class CustomSubscription extends TPage
 
 		$this->pagarme = new PagarMe\Client('ak_test_tyzdxe39mTDFsC0Bfdwlx3hYafC5TH');
 
-       	$this->getSubscription();
-
         if ( !empty($_REQUEST['data']) ) {
         	
         	// DADOS DO CHECKOUT: 
 			// https://docs.pagar.me/docs/overview-checkout
         	$this->startSubscription();
 
-        }
+        } 
 
-        $this->html = new THtmlRenderer('app/resources/custom_checkout.html');
-        $this->html->enableSection('main', array());
+       	$id = $this->getUserSubscription();
+       	$subs = $this->getSubscriptionObj($id);
+
+       	if ($subs) {
+       		// echo var_dump($subs);
+	        // $this->html = new THtmlRenderer('app/resources/custom_sub_status.html');
+
+			//   public 'current_period_start' => string '2019-11-19T22:02:16.050Z' (length=24)
+			//   public 'current_period_end' => string '2019-12-19T22:02:16.050Z' (length=24)
+       		//   public 'status' => string 'paid' (length=4)
+       		//   public 'payment_method' => string 'credit_card' (length=11)
+
+			$iframe = new TElement('iframe');
+	        $iframe->src = $subs->manage_url;
+	        $iframe->frameborder = "0";
+	        $iframe->scrolling = "no";
+	        $iframe->width = "100%";
+	        $iframe->height = "700px";
+	        
+	        $vbox = new TVBox;
+	        $vbox->style = 'width: 100%';
+	        $vbox->add($iframe);
+	        $this->html = $vbox;
+
+
+       	} else {
+	        $this->html = new THtmlRenderer('app/resources/custom_checkout.html');
+	        $this->html->enableSection('main', array());
+       	}
 
         parent::add($this->html);  
 
 	}
 
-	public function getSubscription()
-	{
-
-		$substription = $this->pagarme->subscriptions()->get([
-		    'id' => '451641'
-		]);
-
-
-		$substription_transactions = $this->pagarme->subscriptions()->transactions([
-    		'subscription_id' => '451641'
-		]);
-
-		echo var_dump($substription);
-		// echo var_dump($substription_transactions);
-	}
-
 	public function startSubscription()
 	{
-		$pagarme = new PagarMe\Client('ak_test_tyzdxe39mTDFsC0Bfdwlx3hYafC5TH');
 
     	$data = json_decode($_REQUEST['data']);
     	$data = $this->object2array($data);
-
 
     	$data['customer']['external_id'] = TSession::getValue('userid');
     	$data['plan_id'] = '442204';
 
-		$subscription = $pagarme->subscriptions()->create($data);
+		$subs = $this->pagarme->subscriptions()->create($data);
 
-		// echo var_dump($subscription);
+		$this->setUserSubscription($subs->id);
+
+		return $subs;
 	}
 
-	public function doTransaction()
+	public function getUserSubscription()
 	{
-    	$data = json_decode($_REQUEST['data']);
-    	$data = $this->object2array($data);
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
+			$user = new SystemUser(TSession::getValue('userid'));
+            TTransaction::close(); // Closes the transaction 
+            return $user->subscription;
+        } 
+        catch (Exception $e) 
+        { 
+            new TMessage('error', $e->getMessage()); 
+        }
 
-    	$data['customer']['type'] = 'individual';
-    	$data['customer']['country'] = 'br';
-    	$data['customer']['documents'] = [[
-    		'type' => 'cpf',
-			'number' => $data['customer']['document_number']
-    	]];
+	}
 
-    	$phone = '+55' . $data['customer']['phone']['ddd'] . $data['customer']['phone']['number'];
+	public function setUserSubscription($id)
+	{
+        try 
+        { 
+            TTransaction::open('permission'); // open transaction 
+			$user = new SystemUser(TSession::getValue('userid'));
+			$user->subscription = $id;
+			$user->store();
+            TTransaction::close(); // Closes the transaction 
+            return $user;
+        } 
+        catch (Exception $e) 
+        { 
+            TTransaction::rollback();
+            new TMessage('error', $e->getMessage()); 
+        }
 
-    	$data['customer']['phone_numbers'] = [$phone];
+	}
 
-		$data['billing'] = [
-			'name' => $data['customer']['name'],
-			'address' => $data['customer']['address']
-		];
+	public function getSubscriptionObj($id)
+	{
 
-		$data['billing']['address']['country'] = 'br';
+		$id = (string) $id;
 
-		if (empty($data['billing']['address']['complementary'])) {
-			unset($data['billing']['address']['complementary']);
+		if (empty($id)) {
+			return '';
 		}
 
-        $data['items'] = [ 0=> [
-            'id' => '1',
-            'title' => 'ASSINATURA ÚNICA',
-            'unit_price' => '2990',
-            'quantity' => '1',
-            'tangible' => 'false'
-        ]];
+		try {	
 
-    	unset($data['customer']['address']);
-    	unset($data['customer']['document_number']);
-    	unset($data['customer']['phone']);
+			return $this->pagarme->subscriptions()->get([
+			    'id' => $id
+			    // 'id' => '451641'
+			]);
 
-		$pagarme = new PagarMe\Client(
-			'ak_test_tyzdxe39mTDFsC0Bfdwlx3hYafC5TH'
-		); 
+		} catch (Exception $e) {
+			return '';
+		}
 
-		$transaction = $pagarme->transactions()->create($data);
+	}
 
-		echo var_dump($transaction);
+	public function getTransactionsObj($id)
+	{
+		return  $this->pagarme->subscriptions()->transactions([
+    		'subscription_id' => (string) $id
+		]);
 	}
 
 	public function object2array( $o )
