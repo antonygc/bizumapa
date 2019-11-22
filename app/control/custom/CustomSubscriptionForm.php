@@ -1,35 +1,25 @@
 <?php
 
-/**
- * 
- */
-
 // 5234215625186649
 
 
-class CustomSubscription extends TPage
+class CustomSubscriptionForm extends TPage
 {
 	
-	protected $pagarme;
 	protected $form;
-
 
 	function __construct()
 	{
         parent::__construct();
 
-		$this->pagarme = new PagarMe\Client('ak_test_tyzdxe39mTDFsC0Bfdwlx3hYafC5TH');
-
         if ( !empty($_REQUEST['data']) ) {
-        	
-        	// DADOS DO CHECKOUT: 
-			// https://docs.pagar.me/docs/overview-checkout
+
         	$this->startSubscription();
 
         } 
 
-       	$id = $this->getUserSubscription();
-       	$subs = $this->getSubscriptionObj($id);
+       	$id = CustomSubscriptionInterface::getUserSubscription();
+       	$subs = CustomSubscriptionInterface::getSubscriptionObj($id);
 
        	if ($subs) {
 
@@ -46,82 +36,14 @@ class CustomSubscription extends TPage
 
 	public function startSubscription()
 	{
-
+		// $data = https://docs.pagar.me/docs/overview-checkout
     	$data = json_decode($_REQUEST['data']);
     	$data = $this->object2array($data);
 
-    	$data['customer']['external_id'] = TSession::getValue('userid');
-    	$data['plan_id'] = '442204';
-
-		$subs = $this->pagarme->subscriptions()->create($data);
-
-		$this->setUserSubscription($subs->id);
-
+    	$subs = CustomSubscriptionInterface::createSubscription($data);
+		CustomSubscriptionInterface::setUserSubscription($subs->id);
+		
 		return $subs;
-	}
-
-	public function getUserSubscription()
-	{
-        try 
-        { 
-            TTransaction::open('permission'); // open transaction 
-			$user = new SystemUser(TSession::getValue('userid'));
-            TTransaction::close(); // Closes the transaction 
-            return $user->subscription;
-        } 
-        catch (Exception $e) 
-        { 
-            new TMessage('error', $e->getMessage()); 
-        }
-
-	}
-
-	public function setUserSubscription($id)
-	{
-        try 
-        { 
-            TTransaction::open('permission'); // open transaction 
-			$user = new SystemUser(TSession::getValue('userid'));
-			$user->subscription = $id;
-			$user->store();
-            TTransaction::close(); // Closes the transaction 
-            return $user;
-        } 
-        catch (Exception $e) 
-        { 
-            TTransaction::rollback();
-            new TMessage('error', $e->getMessage()); 
-        }
-
-	}
-
-	public function getSubscriptionObj($id)
-	{
-
-		$id = (string) $id;
-
-		if (empty($id)) {
-			return '';
-		}
-
-		try {	
-
-			return $this->pagarme->subscriptions()->get([
-			    'id' => $id
-			    // 'id' => '451641'
-			]);
-
-		} catch (Exception $e) {
-			return '';
-		}
-
-	}
-
-	public function getTransactionsObj($id)
-	{
-		return  $this->pagarme->subscriptions()->transactions([
-    		'subscription_id' => (string) $id
-		]);
 	}
 
 	public function object2array( $o )
@@ -163,8 +85,6 @@ class CustomSubscription extends TPage
         $paymethod->setEditable(FALSE);
 
         $id->setSize('38%');
-        // $plan->setSize('38%');
-        // $status->setSize('38%');
         $created->setMask('dd/mm/yyyy hh:ii');
         $expires->setMask('dd/mm/yyyy hh:ii');
         $created->setDatabaseMask('yyyy-mm-dd hh:ii');
@@ -199,8 +119,8 @@ class CustomSubscription extends TPage
         $form->addContent( [$label] );
 
         $form->addFields( [new TLabel('Status')], 	   [$status] );
-        $form->addFields( [new TLabel('Início em')],  [$created], 
-                          [new TLabel('Expira em')],  [$expires]);
+        $form->addFields( [new TLabel('Válida desde')],  [$created], 
+                          [new TLabel('Válida até')],  [$expires]);
         
         $label = new TLabel('Alterações e Cancelamento', '', 12, 'i');
         $label->style= $label_style;

@@ -13,7 +13,7 @@
 
   <menuitem label="Assinatura">
     <icon>fa:shopping-cart fa:fw fa-lg</icon>
-    <action>CustomSubscription</action>
+    <action>CustomSubscriptionForm</action>
   </menuitem>
 
   <menuitem label="Classificação">

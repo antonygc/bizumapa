@@ -29,6 +29,11 @@ if (TSession::getValue('logged') OR $public)
         $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
         AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);
     }
+
+    if (!$public) {
+        // CustomSubscriptionInterface::checkSubscription();
+        // new TMessage('info', 'Assinatura');
+    }    
 }
 else
 {
