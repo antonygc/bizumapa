@@ -8,13 +8,81 @@ class CustomSubscriptionInterface
 		return new PagarMe\Client(API_KEY);
 	}
 
+	public static function checkSubscription()
+	{
+
+		$is_admin = CustomApplicationUtils::isAdmin();
+		$subs = TSession::getValue('subscription');
+
+		$user_creation = TSession::getValue('usercreation');
+		$user_creation = new DateTime($user_creation);
+
+		echo var_dump($user_creation);
+
+		if (is_null($subs)) {
+
+			// Ver se existe assinatura no BD
+			$subs = CustomSubscriptionInterface::getUserSubscription();
+
+			if (is_null($subs)) {
+
+				// Usuário logou agora, mas não tem assinatura
+				TSession::setValue('subscription', '0');
+				new TMessage('info', 'Sem assinatura'); 
+
+			
+			} else {
+
+				// Usuário logou agora, e tem assinatura
+				// CustomSubscriptionInterface::checkValidation($subs);
+
+			}
+			
+		} elseif ($subs == '0') {
+
+			// Usuário já estava logado e não tem assinatura
+			// CustomSubscriptionInterface::checkValidation($subs);
+			
+		} else {
+
+			// Usuário já estava logado e tem assinatura
+			// CustomSubscriptionInterface::checkValidation($subs);
+		}
+
+		return true;
+
+		
+	}
+
+	public static function checkValidation($subs)
+	{
+		$subs_obj = CustomSubscriptionInterface::getSubscriptionObj($subs);
+		TSession::setValue('subscription', $subs_obj->current_period_end);
+		# code...
+	}
+
+	public static function createSubscription($data)
+	{
+    	$data['customer']['external_id'] = TSession::getValue('userid');
+    	$data['plan_id'] = PLAN_ID;
+
+		try {
+
+			return $this->pagarme->subscriptions()->create($data);
+			
+		} catch (Exception $e) {
+			
+		}
+
+	}
+
 	public static function getUserSubscription()
 	{
         try 
         { 
-            TTransaction::open('permission'); // open transaction 
+            TTransaction::open('permission'); 
 			$user = new SystemUser(TSession::getValue('userid'));
-            TTransaction::close(); // Closes the transaction 
+            TTransaction::close(); 
             return $user->subscription;
         } 
         catch (Exception $e) 
@@ -28,11 +96,11 @@ class CustomSubscriptionInterface
 	{
         try 
         { 
-            TTransaction::open('permission'); // open transaction 
+            TTransaction::open('permission'); 
 			$user = new SystemUser(TSession::getValue('userid'));
 			$user->subscription = $id;
 			$user->store();
-            TTransaction::close(); // Closes the transaction 
+            TTransaction::close(); 
             return $user;
         } 
         catch (Exception $e) 

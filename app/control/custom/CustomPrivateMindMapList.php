@@ -17,7 +17,7 @@ class CustomPrivateMindMapList extends TStandardList
 
         if (TSession::getValue('current_folder_id') == NULL) {
             TSession::setValue('current_folder_id', '1');        
-            TSession::setValue('current_folder_name', 'Minhas Pastas');        
+            TSession::setValue('current_folder_name', 'Meus Mapas Mentais');        
             TSession::setValue('current_folder_parent_id', NULL);        
         }
 
@@ -28,8 +28,8 @@ class CustomPrivateMindMapList extends TStandardList
         $this->createPanel();
         
         $container = new TVBox;
-        $container->style = 'width: 80%';
-        $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
+        $container->style = 'width: 100%';
+        // $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->panel);
         
         parent::add($container);
@@ -54,7 +54,7 @@ class CustomPrivateMindMapList extends TStandardList
             </div>';
 
         $this->search_btn = new TPanelGroup('');
-        $this->search_btn->style = 'border-color:#fff';
+        $this->search_btn->style = 'border-color:#fff; width: 100%;';
         $this->search_btn->add($tpl);
     }
 
@@ -218,15 +218,22 @@ class CustomPrivateMindMapList extends TStandardList
     {
         $this->panel = new BootstrapFormBuilder;
         $this->panel->setFormTitle(TSession::getValue('current_folder_name'));
-        // $this->panel->setFormTitle('Minhas Pastas');
+        // $this->panel->setFormTitle('Meus Mapas Mentais');
         $this->panel->addHeaderAction('Nova Pasta', new TAction(array($this, 'onCreateFolder')), 'fa:plus-circle green');
         // $this->$btn->class = 'btn btn-sm btn-primary';
-        $this->panel->addHeaderAction('Voltar', new TAction(array($this,'onBackAction')), 'fa:arrow-circle-o-left blue' );
+        $this->panel->addHeaderAction('Voltar Pasta', new TAction(array($this,'onBackAction')), 'fa:arrow-circle-o-left blue' );
+
+        $this->panel->addHeaderAction('Limpar Pesquisa', new TAction(array($this,'onClearFilter')), 'fa:eraser red' );
 
         $this->panel->addFields([$this->search_btn]);
         $this->panel->addFields([$this->datagrid]);
         $this->panel->addFields([$this->pageNavigation]);
     }    
+
+    public function onClearFilter()
+    {
+        $this->onBackAction([]);
+    }
 
     public function onBackAction($params)
     {

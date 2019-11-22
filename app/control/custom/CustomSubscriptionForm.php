@@ -42,7 +42,7 @@ class CustomSubscriptionForm extends TPage
 
     	$subs = CustomSubscriptionInterface::createSubscription($data);
 		CustomSubscriptionInterface::setUserSubscription($subs->id);
-		
+
 		return $subs;
 	}
 

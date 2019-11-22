@@ -57,7 +57,7 @@ CREATE TABLE custom_private_mind_map (
     ) ENGINE=InnoDB;
 
 
-INSERT INTO custom_folder VALUES(1, 'Minhas Pastas', NULL, 1);
+INSERT INTO custom_folder VALUES(1, 'Meus Mapas Mentais', NULL, 1);
 
 
 -- DROP TABLE custom_theme;

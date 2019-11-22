@@ -24,16 +24,28 @@ echo $content;
 
 if (TSession::getValue('logged') OR $public)
 {
-    if ($class)
+    if (!$public) 
+    {
+
+        $valid_subscription = CustomSubscriptionInterface::checkSubscription();
+
+        if (!$valid_subscription) 
+        {
+            AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
+        } 
+        else 
+        {
+            $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
+            AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);       
+        }
+
+    } 
+    elseif ($class) 
     {
         $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
         AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);
     }
 
-    if (!$public) {
-        // CustomSubscriptionInterface::checkSubscription();
-        // new TMessage('info', 'Assinatura');
-    }    
 }
 else
 {

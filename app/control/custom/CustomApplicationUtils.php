@@ -1,6 +1,6 @@
 <?php
 
-class CustomAppUtils
+class CustomApplicationUtils
 {
 
     public static function isAdmin()

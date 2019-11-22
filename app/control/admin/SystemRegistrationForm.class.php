@@ -124,6 +124,8 @@ class SystemRegistrationForm extends TPage
             $object->fromArray( $param );
             $object->password = md5($object->password);
             $object->frontpage_id = $ini['permission']['default_screen'];
+            $now = new DateTime();
+            $object->creation = date('Y-m-d H:i:s', $now->getTimestamp());
             $object->clearParts();
             $object->store();
             
