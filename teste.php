@@ -21,9 +21,11 @@ $date = new DateTime($data);
 // echo $date->format("yyyy-MM-dd'T'HH:mm:ss'Z'");
 $date = $date->format("d-m-y");
 
-$agora = new DateTime()->
+$agora = new DateTime();
+$agora->modify('+1 day');
 
-echo var_dump($agora->getTimestamp());
+
+// echo var_dump($agora->getTimestamp());
 
 $agora = $agora->format("d-m-y");
 

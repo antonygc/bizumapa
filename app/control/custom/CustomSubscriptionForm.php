@@ -2,10 +2,16 @@
 
 // 5234215625186649
 
+// trialing (período de experiência do user)
+// paid = 'Pago'
+// pending_payment = 'Pagamento pendente'
+// unpaid = 'Não pago'
+// cancelled = 'Cancelado'
+// ended
+
 
 class CustomSubscriptionForm extends TPage
 {
-	
 	protected $form;
 
 	function __construct()

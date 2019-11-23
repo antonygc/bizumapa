@@ -29,14 +29,14 @@ if (TSession::getValue('logged') OR $public)
 
         $valid_subscription = CustomSubscriptionInterface::checkSubscription();
 
-        if (!$valid_subscription) 
-        {
-            AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
-        } 
-        else 
+        if ($valid_subscription) 
         {
             $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
             AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);       
+        } 
+        else 
+        {
+            AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
         }
 
     } 

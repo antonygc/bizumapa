@@ -3,6 +3,23 @@
 class CustomSubscriptionInterface
 {
 
+	// Fluxo de Assinatura
+	// https://pagarme.zendesk.com/hc/pt-br/articles/360000215732-Fluxo-de-cobran%C3%A7a-de-uma-assinatura-
+
+	public static $VALID   = 'VALID';
+	public static $INVALID = 'INVALID';
+	public static $CHECK   = 'CHECK';
+
+	public static $STATUS_PAID      = 'paid';
+	public static $STATUS_ENDED     = 'ended';
+	public static $STATUS_UNPAID    = 'unpaid';
+	public static $STATUS_PENDING   = 'pending_payment';
+	public static $STATUS_TRIALING  = 'trialing';
+	public static $STATUS_CANCELLED = 'cancelled';
+
+	public static $TRIAL_PERIOD = '+1 day';
+	public static $SUBSC_PERIOD = '+1 day';
+
 	public static function getClient()
 	{
 		return new PagarMe\Client(API_KEY);
@@ -11,64 +28,94 @@ class CustomSubscriptionInterface
 	public static function checkSubscription()
 	{
 
-		$is_admin = CustomApplicationUtils::isAdmin();
-		$subs = TSession::getValue('subscription');
+		// TODO:  DESLOGAR USUÁRIO, SE NÃO, É SÓ DEIXAR LOGADO QUE NUNCA VAI 
+		// RETORNAR FALSE
 
-		$user_creation = TSession::getValue('usercreation');
-		$user_creation = new DateTime($user_creation);
-
-		echo var_dump($user_creation);
-
-		if (is_null($subs)) {
-
-			// Ver se existe assinatura no BD
-			$subs = CustomSubscriptionInterface::getUserSubscription();
-
-			if (is_null($subs)) {
-
-				// Usuário logou agora, mas não tem assinatura
-				TSession::setValue('subscription', '0');
-				new TMessage('info', 'Sem assinatura'); 
-
-			
-			} else {
-
-				// Usuário logou agora, e tem assinatura
-				// CustomSubscriptionInterface::checkValidation($subs);
-
-			}
-			
-		} elseif ($subs == '0') {
-
-			// Usuário já estava logado e não tem assinatura
-			// CustomSubscriptionInterface::checkValidation($subs);
-			
-		} else {
-
-			// Usuário já estava logado e tem assinatura
-			// CustomSubscriptionInterface::checkValidation($subs);
+		if (CustomApplicationUtils::isAdmin()) {
+			return true;
 		}
 
-		return true;
+		if (CustomSubscriptionInterface::checkTrial()) {
+			new TMessage('info', 'Período de avaliação em andamento');
+			return true;
+		}
 
+		$subsc = TSession::getValue('subscription');
+
+		switch ($subsc) {
+			case CustomSubscriptionInterface::$VALID:
+				return true;
+				break;
+			case CustomSubscriptionInterface::$INVALID:
+				return false;
+				break;
+			case CustomSubscriptionInterface::$CHECK:
+				return CustomSubscriptionInterface::checkValidation();
+				break;							
+			default:
+				return CustomSubscriptionInterface::checkValidation();
+				break;
+		}
 		
 	}
 
-	public static function checkValidation($subs)
+	public static function checkTrial()
 	{
-		$subs_obj = CustomSubscriptionInterface::getSubscriptionObj($subs);
-		TSession::setValue('subscription', $subs_obj->current_period_end);
-		# code...
+		$user_creation = new DateTime(TSession::getValue('usercreation'));
+
+		$date = $user_creation->format("d-m-y");
+
+		echo var_dump(TSession::getValue('usercreation'));
+		echo var_dump($date);
+
+		$trial_expire = $user_creation->modify(CustomSubscriptionInterface::$TRIAL_PERIOD);
+		$now = new DateTime();
+
+		if ($now > $trial_expire) { return false; }
+		return true;
+	}
+
+	public static function checkValidation()
+	{
+
+		$subsc = CustomSubscriptionInterface::getUserSubscription();
+
+		if (is_null($subsc)) 
+		{
+			TSession::setValue('subscription', CustomSubscriptionInterface::$INVALID );
+			return false;
+		}
+
+		$subsc_obj = CustomSubscriptionInterface::getSubscriptionObj($subs);
+
+		if ($subsc_obj->status != CustomSubscriptionInterface::$STATUS_PAID) {
+			TSession::setValue('subscription', CustomSubscriptionInterface::$INVALID );
+			return false;
+		}
+
+		$period_start = new DateTime($subsc_obj->current_period_start);
+		$period_expire = $period_start->modify(CustomSubscriptionInterface::$SUBSC_PERIOD);
+		$now = new DateTime();
+
+		if ($now > $period_expire) {
+			TSession::setValue('subscription', CustomSubscriptionInterface::$INVALID );
+			return false;
+		}
+
+		TSession::setValue('subscription', CustomSubscriptionInterface::$VALID );
+		return true;
+		
 	}
 
 	public static function createSubscription($data)
 	{
+		$pagarme = CustomSubscriptionInterface::getClient();
     	$data['customer']['external_id'] = TSession::getValue('userid');
     	$data['plan_id'] = PLAN_ID;
 
 		try {
 
-			return $this->pagarme->subscriptions()->create($data);
+			return $pagarme->subscriptions()->create($data);
 			
 		} catch (Exception $e) {
 			
