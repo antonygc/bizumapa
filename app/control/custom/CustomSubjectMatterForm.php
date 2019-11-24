@@ -16,7 +16,7 @@ class CustomSubjectMatterForm extends TPage
         // create the form fields
         $id   = new TEntry('id');
         $name = new TEntry('name');
-        $theme_id = new TDBSeekButton('theme_id', 'permission', 'form_CustomSubjectMatter', 'CustomTheme', 'name', 'theme_id', 'theme_name');
+        $theme_id = new TDBSeekButton('theme_id', DEFAULT_DB, 'form_CustomSubjectMatter', 'CustomTheme', 'name', 'theme_id', 'theme_name');
         $theme_name = new TEntry('theme_name');
         $theme_id->setSize('1');
         // $theme_name->setSize('calc(100% - 200px)');
@@ -81,8 +81,8 @@ class CustomSubjectMatterForm extends TPage
     {
         try
         {
-            // open a transaction with database 'permission'
-            TTransaction::open('permission');
+            // open a transaction with database DEFAULT_DB
+            TTransaction::open(DEFAULT_DB);
             
             // get the form data into an active record System_group
             $object = new CustomSubjectMatter;
@@ -123,8 +123,8 @@ class CustomSubjectMatterForm extends TPage
                 // get the parameter $key
                 $key=$param['key'];
                 
-                // open a transaction with database 'permission'
-                TTransaction::open('permission');
+                // open a transaction with database DEFAULT_DB
+                TTransaction::open(DEFAULT_DB);
                 
                 // instantiates object System_group
                 $object = new CustomSubjectMatter($key);
@@ -166,7 +166,7 @@ class CustomSubjectMatterForm extends TPage
             
             if (!empty($id) AND empty($program_list[$id]))
             {
-                TTransaction::open('permission');
+                TTransaction::open(DEFAULT_DB);
                 $program = SystemProgram::find($id);
                 $program_list[$id] = $program->toArray();
                 TSession::setValue('program_list', $program_list);

@@ -14,6 +14,7 @@ class CustomPrivateMindMapList extends TStandardList
      */
     public function __construct()
     {
+        CustomSubscriptionInterface::checkSubscription($redirect=true);
 
         if (TSession::getValue('current_folder_id') == NULL) {
             TSession::setValue('current_folder_id', '1');        
@@ -61,7 +62,7 @@ class CustomPrivateMindMapList extends TStandardList
 
     public function createDatagrid()
     {
-        parent::setDatabase('permission');            // defines the database
+        parent::setDatabase(DEFAULT_DB);            // defines the database
         parent::setActiveRecord('ViewFolderContents');   // defines the active record
         parent::setDefaultOrder('item_name', 'asc');         // defines the default order
 
@@ -250,7 +251,7 @@ class CustomPrivateMindMapList extends TStandardList
 
         try 
         { 
-            TTransaction::open('permission'); // open transaction 
+            TTransaction::open(DEFAULT_DB); // open transaction 
 
             $criteria = new TCriteria;
             $criteria->add(new TFilter('id', '=', $curr_parent_id));
@@ -298,7 +299,7 @@ class CustomPrivateMindMapList extends TStandardList
     {
         try 
         { 
-            TTransaction::open('permission'); // open transaction 
+            TTransaction::open(DEFAULT_DB); // open transaction 
 
             $folder = new CustomFolder; 
             $folder->name = $params['name']; 
@@ -416,7 +417,7 @@ class CustomPrivateMindMapList extends TStandardList
     {
         try 
         { 
-            TTransaction::open('permission'); // open transaction 
+            TTransaction::open(DEFAULT_DB); // open transaction 
 
             $folder = new CustomFolder($params['item_id']); 
             $folder->name = $params['new_name']; 
@@ -439,7 +440,7 @@ class CustomPrivateMindMapList extends TStandardList
     {
         try 
         { 
-            TTransaction::open('permission'); // open transaction 
+            TTransaction::open(DEFAULT_DB); // open transaction 
 
             $mindmap = new CustomPrivateMindMap($params['item_id']); 
             $mindmap->name = $params['new_name']; 
@@ -484,7 +485,7 @@ class CustomPrivateMindMapList extends TStandardList
     {
         try
         {
-            TTransaction::open('permission');
+            TTransaction::open(DEFAULT_DB);
 
             if ($params['item_type'] == 'folder') {
                 $object = new CustomFolder($params['item_id']);

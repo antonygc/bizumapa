@@ -16,7 +16,7 @@ class CustomThemeForm extends TPage
         // create the form fields
         $id   = new TEntry('id');
         $name = new TEntry('name');
-        // $program_id = new TDBSeekButton('program_id', 'permission', 'form_CustomTheme', 'SystemProgram', 'name', 'program_id', 'program_name');
+        // $program_id = new TDBSeekButton('program_id', DEFAULT_DB, 'form_CustomTheme', 'SystemProgram', 'name', 'program_id', 'program_name');
         // $program_name = new TEntry('program_name');
         // $program_id->setSize('50');
         // $program_name->setSize('calc(100% - 200px)');
@@ -99,8 +99,8 @@ class CustomThemeForm extends TPage
     {
         try
         {
-            // open a transaction with database 'permission'
-            TTransaction::open('permission');
+            // open a transaction with database DEFAULT_DB
+            TTransaction::open(DEFAULT_DB);
             
             // get the form data into an active record System_group
             $object = new CustomTheme;
@@ -149,8 +149,8 @@ class CustomThemeForm extends TPage
                 // get the parameter $key
                 $key=$param['key'];
                 
-                // open a transaction with database 'permission'
-                TTransaction::open('permission');
+                // open a transaction with database DEFAULT_DB
+                TTransaction::open(DEFAULT_DB);
                 
                 // instantiates object System_group
                 $object = new CustomTheme($key);
@@ -212,7 +212,7 @@ class CustomThemeForm extends TPage
             
             if (!empty($id) AND empty($program_list[$id]))
             {
-                TTransaction::open('permission');
+                TTransaction::open(DEFAULT_DB);
                 $program = SystemProgram::find($id);
                 $program_list[$id] = $program->toArray();
                 TSession::setValue('program_list', $program_list);

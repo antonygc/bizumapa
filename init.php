@@ -22,9 +22,10 @@ define('OS', strtoupper(substr(PHP_OS, 0, 3)));
 define('PATH', dirname(__FILE__));
 define('LANG', $ini['general']['language']);
 
-define('API_KEY', $ini['custom']['api_key']);
-define('ENC_KEY', $ini['custom']['enc_key']);
-define('PLAN_ID', $ini['custom']['plan_id']);
+define('DEFAULT_DB', $ini['custom']['api_key']);
+define('API_KEY', 	 $ini['custom']['api_key']);
+define('ENC_KEY',    $ini['custom']['enc_key']);
+define('PLAN_ID',    $ini['custom']['plan_id']);
 
 
 if (version_compare(PHP_VERSION, '5.5.0') == -1)

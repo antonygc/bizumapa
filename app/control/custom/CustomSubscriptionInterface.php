@@ -25,7 +25,7 @@ class CustomSubscriptionInterface
 		return new PagarMe\Client(API_KEY);
 	}
 
-	public static function checkSubscription()
+	public static function checkSubscription($redirect=false)
 	{
 
 		// TODO:  DESLOGAR USUÁRIO, SE NÃO, É SÓ DEIXAR LOGADO QUE NUNCA VAI 
@@ -36,7 +36,7 @@ class CustomSubscriptionInterface
 		}
 
 		if (CustomSubscriptionInterface::checkTrial()) {
-			new TMessage('info', 'Período de avaliação em andamento');
+			// new TMessage('info', 'Período de avaliação em andamento');
 			return true;
 		}
 
@@ -44,30 +44,30 @@ class CustomSubscriptionInterface
 
 		switch ($subsc) {
 			case CustomSubscriptionInterface::$VALID:
-				return true;
+				$isvalid = true;
 				break;
 			case CustomSubscriptionInterface::$INVALID:
-				return false;
+				$isvalid = false;
 				break;
 			case CustomSubscriptionInterface::$CHECK:
-				return CustomSubscriptionInterface::checkValidation();
+				$isvalid = CustomSubscriptionInterface::checkValidation();
 				break;							
 			default:
-				return CustomSubscriptionInterface::checkValidation();
+				$isvalid = CustomSubscriptionInterface::checkValidation();
 				break;
 		}
+
+		if (!$isvalid and $redirect) {
+			AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
+		}
+
+		return $isvalid;
 		
 	}
 
 	public static function checkTrial()
 	{
 		$user_creation = new DateTime(TSession::getValue('usercreation'));
-
-		$date = $user_creation->format("d-m-y");
-
-		echo var_dump(TSession::getValue('usercreation'));
-		echo var_dump($date);
-
 		$trial_expire = $user_creation->modify(CustomSubscriptionInterface::$TRIAL_PERIOD);
 		$now = new DateTime();
 
@@ -127,7 +127,7 @@ class CustomSubscriptionInterface
 	{
         try 
         { 
-            TTransaction::open('permission'); 
+            TTransaction::open(DEFAULT_DB); 
 			$user = new SystemUser(TSession::getValue('userid'));
             TTransaction::close(); 
             return $user->subscription;
@@ -143,7 +143,7 @@ class CustomSubscriptionInterface
 	{
         try 
         { 
-            TTransaction::open('permission'); 
+            TTransaction::open(DEFAULT_DB); 
 			$user = new SystemUser(TSession::getValue('userid'));
 			$user->subscription = $id;
 			$user->store();

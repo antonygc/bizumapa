@@ -14,6 +14,9 @@ class CustomPublicMindMapList extends TStandardList
      */
     public function __construct()
     {
+
+        CustomSubscriptionInterface::checkSubscription($redirect=true);
+
         parent::__construct();
 
         $this->createSearchForm();
@@ -35,7 +38,7 @@ class CustomPublicMindMapList extends TStandardList
 
     public function createSearchForm()
     {
-        parent::setDatabase('permission');            
+        parent::setDatabase(DEFAULT_DB);            
         parent::setActiveRecord('CustomPublicMindMap');   
         parent::setDefaultOrder('id', 'asc');         
         parent::addFilterField('id', '=', 'id'); 
@@ -52,8 +55,8 @@ class CustomPublicMindMapList extends TStandardList
         $name = new TEntry('name');
         $filter = new TCriteria;
         $filter->add(new TFilter('id', '<', '0'));
-        $theme_id = new TDBCombo('theme_id', 'permission', 'CustomTheme', 'id', 'name', 'name');
-        $subject_matter_id = new TDBCombo('subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', 'name', 'name', $filter);
+        $theme_id = new TDBCombo('theme_id', DEFAULT_DB, 'CustomTheme', 'id', 'name', 'name');
+        $subject_matter_id = new TDBCombo('subject_matter_id', DEFAULT_DB, 'CustomSubjectMatter', 'id', 'name', 'name', $filter);
         
         // add the fields
         // $this->form->addFields( [new TLabel('ID')], [$id] );
@@ -179,13 +182,13 @@ class CustomPublicMindMapList extends TStandardList
     {
         try
         {
-            TTransaction::open('permission');
+            TTransaction::open(DEFAULT_DB);
             if (!empty($param['theme_id']))
             {
                 $criteria = TCriteria::create( ['theme_id' => $param['theme_id'] ] );
                 
                 // formname, field, database, model, key, value, ordercolumn = NULL, criteria = NULL, startEmpty = FALSE
-                TDBCombo::reloadFromModel('form_search_CustomPublicMindMap', 'subject_matter_id', 'permission', 'CustomSubjectMatter', 'id', '{name}', 'name', $criteria, TRUE);
+                TDBCombo::reloadFromModel('form_search_CustomPublicMindMap', 'subject_matter_id', DEFAULT_DB, 'CustomSubjectMatter', 'id', '{name}', 'name', $criteria, TRUE);
             }
             else
             {
@@ -234,7 +237,7 @@ class CustomPublicMindMapList extends TStandardList
 
         $filter = new TCriteria;
         $filter->add(new TFilter('user_id', '=', TSession::getValue('userid')));
-        $folder_id = new TDBCombo('folder_id', 'permission', 'CustomFolder', 'id', 'name', 'name', $filter);
+        $folder_id = new TDBCombo('folder_id', DEFAULT_DB, 'CustomFolder', 'id', 'name', 'name', $filter);
         $folder_id->enableSearch();
 
         $form->addQuickField('Nome:', $name);        
@@ -260,7 +263,7 @@ class CustomPublicMindMapList extends TStandardList
 
         try 
         { 
-            TTransaction::open('permission'); // open transaction 
+            TTransaction::open(DEFAULT_DB); // open transaction 
 
             $public_mindmap = new CustomPublicMindMap((int) $params['id']);
 
