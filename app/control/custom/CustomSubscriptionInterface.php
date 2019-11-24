@@ -15,7 +15,7 @@ class CustomSubscriptionInterface
 	public static $STATUS_UNPAID    = 'unpaid';
 	public static $STATUS_PENDING   = 'pending_payment';
 	public static $STATUS_TRIALING  = 'trialing';
-	public static $STATUS_CANCELLED = 'cancelled';
+	public static $STATUS_CANCELLED = 'canceled';
 
 	public static $TRIAL_PERIOD = '+1 day';
 	public static $SUBSC_PERIOD = '+1 day';
@@ -25,7 +25,7 @@ class CustomSubscriptionInterface
 		return new PagarMe\Client(API_KEY);
 	}
 
-	public static function getCookie($value)
+	public static function getCookie()
 	{
 		return TSession::getValue('subscription');
 	}
@@ -35,14 +35,14 @@ class CustomSubscriptionInterface
 		TSession::setValue('subscription', $value );
 	}	
 
-	public static function checkSubscription($redirect=false)
+	public static function checkSubscription($redirect=FALSE)
 	{
 
 		// TODO:  DESLOGAR USUÁRIO, SE NÃO, É SÓ DEIXAR LOGADO QUE NUNCA VAI 
 		// RETORNAR FALSE
 
 		if (CustomApplicationUtils::isAdmin()) {
-			return true;
+			return TRUE;
 		}
 
 		$is_trial_valid = CustomSubscriptionInterface::checkExpirationDate(
@@ -51,17 +51,17 @@ class CustomSubscriptionInterface
 
 		if ($is_trial_valid) {
 			// new TMessage('info', 'Período de avaliação em andamento');
-			return true;
+			return TRUE;
 		}
 
 		$subsc = CustomSubscriptionInterface::getCookie();
 
 		switch ($subsc) {
 			case CustomSubscriptionInterface::$VALID:
-				$isvalid = true;
+				$isvalid = TRUE;
 				break;
 			case CustomSubscriptionInterface::$INVALID:
-				$isvalid = false;
+				$isvalid = FALSE;
 				break;
 			case CustomSubscriptionInterface::$CHECK:
 				$isvalid = CustomSubscriptionInterface::checkValidation();
@@ -93,7 +93,7 @@ class CustomSubscriptionInterface
 		$period_start = new DateTime($start_date);
 		$period_expire = $period_start->modify($period);
 		$now = new DateTime();
-		$is_expired = ($now > $period_expire) ? false : true ;
+		$is_expired = ($now > $period_expire) ? FALSE : TRUE ;
 		return $is_expired;
 	}	
 
@@ -102,24 +102,27 @@ class CustomSubscriptionInterface
 
 		$subsc = CustomSubscriptionInterface::getUserSubscription();
 
-		if (is_null($subsc)) { return false; }
+		if (is_null($subsc)) { return FALSE; }
 
-		$subsc_obj = CustomSubscriptionInterface::getSubscriptionObj($subs);
+		$subsc_obj = CustomSubscriptionInterface::getSubscriptionObj($subsc);
 
 		switch ($subsc_obj->status) {
 
 			case CustomSubscriptionInterface::$STATUS_PAID:
-				return true;
+				return TRUE;
 
 			case CustomSubscriptionInterface::$STATUS_CANCELLED:
 				$is_valid = CustomSubscriptionInterface::checkExpirationDate(
 					$subsc_obj->current_period_start,
 					CustomSubscriptionInterface::$SUBSC_PERIOD
 				);
+				if (!$is_valid) { 
+					CustomSubscriptionInterface::setUserSubscription(null); 
+				}
 				return $is_valid;
 			
 			default:
-				return false;
+				return FALSE;
 		}
 		
 	}

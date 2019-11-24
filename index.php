@@ -24,28 +24,8 @@ echo $content;
 
 if (TSession::getValue('logged') OR $public)
 {
-    if (!$public) 
-    {
-
-        $valid_subscription = CustomSubscriptionInterface::checkSubscription();
-
-        if ($valid_subscription) 
-        {
-            $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
-            AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);       
-        } 
-        else 
-        {
-            AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
-        }
-
-    } 
-    elseif ($class) 
-    {
-        $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
-        AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);
-    }
-
+    $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
+    AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);
 }
 else
 {

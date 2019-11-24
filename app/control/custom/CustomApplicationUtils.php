@@ -8,4 +8,9 @@ class CustomApplicationUtils
         $usergroupis = TSession::getValue('usergroupids');
         return in_array('1', $usergroupis);
     }
+
+    public static function exceptionHandler($e)
+    {
+    	# code...
+    }
 }

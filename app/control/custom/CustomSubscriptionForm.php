@@ -2,14 +2,6 @@
 
 // 5234215625186649
 
-// trialing (período de experiência do user)
-// paid = 'Pago'
-// pending_payment = 'Pagamento pendente'
-// unpaid = 'Não pago'
-// cancelled = 'Cancelado'
-// ended
-
-
 class CustomSubscriptionForm extends TPage
 {
 	protected $form;
@@ -18,6 +10,8 @@ class CustomSubscriptionForm extends TPage
 	{
         parent::__construct();
 
+        // echo var_dump($_REQUEST);
+
         if ( !empty($_REQUEST['data']) ) {
 
         	$this->startSubscription();
@@ -25,15 +19,17 @@ class CustomSubscriptionForm extends TPage
         } 
 
        	$id = CustomSubscriptionInterface::getUserSubscription();
-       	$subs = CustomSubscriptionInterface::getSubscriptionObj($id);
 
-       	if ($subs) {
+       	if ($id) {
 
+       	    $subs = CustomSubscriptionInterface::getSubscriptionObj($id);
+
+            // echo var_dump($subs);
 	        $this->html = $this->getSubscriptionStatusForm($subs);
 
        	} else {
 	        $this->html = new THtmlRenderer('app/resources/custom_checkout.html');
-	        $this->html->enableSection('main', array());
+	        $this->html->enableSection('main', array('encryption_key' => ENC_KEY ));
        	}
 
         parent::add($this->html);  
@@ -48,6 +44,8 @@ class CustomSubscriptionForm extends TPage
 
     	$subs = CustomSubscriptionInterface::createSubscription($data);
 		CustomSubscriptionInterface::setUserSubscription($subs->id);
+
+        CustomSubscriptionInterface::setCookie(CustomSubscriptionInterface::$CHECK);
 
 		return $subs;
 	}

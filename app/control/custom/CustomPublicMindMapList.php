@@ -60,7 +60,7 @@ class CustomPublicMindMapList extends TStandardList
         
         // add the fields
         // $this->form->addFields( [new TLabel('ID')], [$id] );
-        $this->form->addFields( [new TLabel('Mapa Mental')], [$name] );
+        // $this->form->addFields( [new TLabel('Mapa Mental')], [$name] );
         $this->form->addFields( [new TLabel('Matéria')], [$theme_id] );
         $this->form->addFields( [new TLabel('Assunto')], [$subject_matter_id] );
 
