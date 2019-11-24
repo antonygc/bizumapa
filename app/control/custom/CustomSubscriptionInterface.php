@@ -25,6 +25,16 @@ class CustomSubscriptionInterface
 		return new PagarMe\Client(API_KEY);
 	}
 
+	public static function getCookie($value)
+	{
+		return TSession::getValue('subscription');
+	}
+
+	public static function setCookie($value)
+	{
+		TSession::setValue('subscription', $value );
+	}	
+
 	public static function checkSubscription($redirect=false)
 	{
 
@@ -35,12 +45,16 @@ class CustomSubscriptionInterface
 			return true;
 		}
 
-		if (CustomSubscriptionInterface::checkTrial()) {
+		$is_trial_valid = CustomSubscriptionInterface::checkExpirationDate(
+				TSession::getValue('usercreation'),
+				CustomSubscriptionInterface::$TRIAL_PERIOD);
+
+		if ($is_trial_valid) {
 			// new TMessage('info', 'Período de avaliação em andamento');
 			return true;
 		}
 
-		$subsc = TSession::getValue('subscription');
+		$subsc = CustomSubscriptionInterface::getCookie();
 
 		switch ($subsc) {
 			case CustomSubscriptionInterface::$VALID:
@@ -57,53 +71,56 @@ class CustomSubscriptionInterface
 				break;
 		}
 
-		if (!$isvalid and $redirect) {
-			AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
+		if ($isvalid) {
+
+			CustomSubscriptionInterface::setCookie(CustomSubscriptionInterface::$VALID);
+
+		} else {
+
+			CustomSubscriptionInterface::setCookie(CustomSubscriptionInterface::$INVALID);
+
+			if ($redirect) {
+				AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
+			}
 		}
 
 		return $isvalid;
 		
 	}
 
-	public static function checkTrial()
+	public static function checkExpirationDate($start_date, $period)
 	{
-		$user_creation = new DateTime(TSession::getValue('usercreation'));
-		$trial_expire = $user_creation->modify(CustomSubscriptionInterface::$TRIAL_PERIOD);
+		$period_start = new DateTime($start_date);
+		$period_expire = $period_start->modify($period);
 		$now = new DateTime();
-
-		if ($now > $trial_expire) { return false; }
-		return true;
-	}
+		$is_expired = ($now > $period_expire) ? false : true ;
+		return $is_expired;
+	}	
 
 	public static function checkValidation()
 	{
 
 		$subsc = CustomSubscriptionInterface::getUserSubscription();
 
-		if (is_null($subsc)) 
-		{
-			TSession::setValue('subscription', CustomSubscriptionInterface::$INVALID );
-			return false;
-		}
+		if (is_null($subsc)) { return false; }
 
 		$subsc_obj = CustomSubscriptionInterface::getSubscriptionObj($subs);
 
-		if ($subsc_obj->status != CustomSubscriptionInterface::$STATUS_PAID) {
-			TSession::setValue('subscription', CustomSubscriptionInterface::$INVALID );
-			return false;
+		switch ($subsc_obj->status) {
+
+			case CustomSubscriptionInterface::$STATUS_PAID:
+				return true;
+
+			case CustomSubscriptionInterface::$STATUS_CANCELLED:
+				$is_valid = CustomSubscriptionInterface::checkExpirationDate(
+					$subsc_obj->current_period_start,
+					CustomSubscriptionInterface::$SUBSC_PERIOD
+				);
+				return $is_valid;
+			
+			default:
+				return false;
 		}
-
-		$period_start = new DateTime($subsc_obj->current_period_start);
-		$period_expire = $period_start->modify(CustomSubscriptionInterface::$SUBSC_PERIOD);
-		$now = new DateTime();
-
-		if ($now > $period_expire) {
-			TSession::setValue('subscription', CustomSubscriptionInterface::$INVALID );
-			return false;
-		}
-
-		TSession::setValue('subscription', CustomSubscriptionInterface::$VALID );
-		return true;
 		
 	}
 
