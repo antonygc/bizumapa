@@ -35,7 +35,7 @@ class CustomSubscriptionInterface
 		TSession::setValue('subscription', $value );
 	}	
 
-	public static function checkSubscription($redirect=FALSE)
+	public static function checkSubscription($obj=null)
 	{
 
 		// TODO:  DESLOGAR USUÁRIO, SE NÃO, É SÓ DEIXAR LOGADO QUE NUNCA VAI 
@@ -50,7 +50,14 @@ class CustomSubscriptionInterface
 				CustomSubscriptionInterface::$TRIAL_PERIOD);
 
 		if ($is_trial_valid) {
-			// new TMessage('info', 'Período de avaliação em andamento');
+
+			if ($obj) {
+				$alert = '<div class="talert alert alert-dismissible alert-info" role="alert">
+							Período de avaliação
+					 	  </div>';
+				$obj->addElement($alert);
+			}
+
 			return TRUE;
 		}
 
@@ -78,10 +85,7 @@ class CustomSubscriptionInterface
 		} else {
 
 			CustomSubscriptionInterface::setCookie(CustomSubscriptionInterface::$INVALID);
-
-			if ($redirect) {
-				AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
-			}
+			
 		}
 
 		return $isvalid;

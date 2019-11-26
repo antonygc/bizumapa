@@ -30,7 +30,7 @@ class CustomPublicMindMapList extends TStandardList
         $container->add($this->form);
         $container->add($panel);
         
-        $subsc_ok = CustomSubscriptionInterface::checkSubscription();
+        $subsc_ok = CustomSubscriptionInterface::checkSubscription($this);
 
         if (!$subsc_ok) {
             AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
@@ -38,6 +38,12 @@ class CustomPublicMindMapList extends TStandardList
         }
 
         parent::add($container);
+    }
+
+    public function addElement($el)
+    {
+        // Called by CustomSubscriptionInterface::checkSubscription
+        parent::add($el);
     }
 
     public function createSearchForm()

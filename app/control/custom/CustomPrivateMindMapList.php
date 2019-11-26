@@ -32,7 +32,7 @@ class CustomPrivateMindMapList extends TStandardList
         // $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->panel);
         
-        $subsc_ok = CustomSubscriptionInterface::checkSubscription();
+        $subsc_ok = CustomSubscriptionInterface::checkSubscription($this);
 
         if (!$subsc_ok) {
             AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
@@ -41,6 +41,12 @@ class CustomPrivateMindMapList extends TStandardList
         
         parent::add($container);
 
+    }
+
+    public function addElement($el)
+    {
+        // Called by CustomSubscriptionInterface::checkSubscription
+        parent::add($el);
     }
 
     public function createSearchButton()
