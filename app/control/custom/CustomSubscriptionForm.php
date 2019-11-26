@@ -38,16 +38,19 @@ class CustomSubscriptionForm extends TPage
 
 	public function startSubscription()
 	{
+
+        // https://pagarme.zendesk.com/hc/pt-br/articles/206300373-Como-simulo-erro-em-uma-transa%C3%A7%C3%A3o-de-teste-
+
 		// $data = https://docs.pagar.me/docs/overview-checkout
     	$data = json_decode($_REQUEST['data']);
     	$data = $this->object2array($data);
-
     	$subs = CustomSubscriptionInterface::createSubscription($data);
-		CustomSubscriptionInterface::setUserSubscription($subs->id);
 
-        CustomSubscriptionInterface::setCookie(CustomSubscriptionInterface::$CHECK);
-
-		return $subs;
+        if ($subs) {
+    		CustomSubscriptionInterface::setUserSubscription($subs->id);
+            CustomSubscriptionInterface::setCookie(CustomSubscriptionInterface::$CHECK);
+    		return $subs;
+        }
 	}
 
 	public function object2array( $o )

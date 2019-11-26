@@ -138,7 +138,8 @@ class CustomSubscriptionInterface
 			return $pagarme->subscriptions()->create($data);
 			
 		} catch (Exception $e) {
-			
+
+			CustomApplicationUtils::exceptionHandler($e);
 		}
 
 	}
@@ -154,7 +155,7 @@ class CustomSubscriptionInterface
         } 
         catch (Exception $e) 
         { 
-            new TMessage('error', $e->getMessage()); 
+			CustomApplicationUtils::exceptionHandler($e);
         }
 
 	}
@@ -173,7 +174,7 @@ class CustomSubscriptionInterface
         catch (Exception $e) 
         { 
             TTransaction::rollback();
-            new TMessage('error', $e->getMessage()); 
+			CustomApplicationUtils::exceptionHandler($e);
         }
 
 	}
@@ -193,18 +194,27 @@ class CustomSubscriptionInterface
 			return $pagarme->subscriptions()->get(['id' => $id]);
 
 		} catch (Exception $e) {
-			return;
+			CustomApplicationUtils::exceptionHandler($e);
 		}
 
 	}
 
-	public function getTransactionsObj($id)
+	public static function getTransactionsObj($id)
 	{
 
 		$pagarme = CustomSubscriptionInterface::getClient();
-		return  $pagarme->subscriptions()->transactions([
-    		'subscription_id' => (string) $id
-		]);
+
+		try {
+
+			return  $pagarme->subscriptions()->transactions([
+	    		'subscription_id' => (string) $id
+			]);
+			
+		} catch (Exception $e) {
+
+			CustomApplicationUtils::exceptionHandler($e);
+		
+		}
 	}
 
 }

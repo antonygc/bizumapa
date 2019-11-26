@@ -11,6 +11,17 @@ class CustomApplicationUtils
 
     public static function exceptionHandler($e)
     {
-    	# code...
+		$reflect = new ReflectionClass($e);
+
+		switch ($reflect->getShortName()) {
+			case 'PagarMeException':
+				new TMessage('error', $e->errorMessage);
+				break;
+			
+			default:
+				new TMessage('error', $e->getMessage());
+				break;
+		}
     }
+
 }

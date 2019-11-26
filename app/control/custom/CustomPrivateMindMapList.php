@@ -14,7 +14,6 @@ class CustomPrivateMindMapList extends TStandardList
      */
     public function __construct()
     {
-        CustomSubscriptionInterface::checkSubscription($redirect=true);
 
         if (TSession::getValue('current_folder_id') == NULL) {
             TSession::setValue('current_folder_id', '1');        
@@ -33,6 +32,13 @@ class CustomPrivateMindMapList extends TStandardList
         // $container->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
         $container->add($this->panel);
         
+        $subsc_ok = CustomSubscriptionInterface::checkSubscription();
+
+        if (!$subsc_ok) {
+            AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
+            return;
+        }
+        
         parent::add($container);
 
     }
@@ -44,7 +50,6 @@ class CustomPrivateMindMapList extends TStandardList
 
         $tpl = '
             <div class="input-group sidebar-form">
-                <input type="text" name="q" value="'. $q .'" class="form-control" placeholder="Pesquisar meus mapas...">
                 <span class="input-group-btn">
                     <!-- Previne abrir janela com mapa selecionado anteriormente -->
                     <input type="hidden" name="method" value="">
@@ -52,6 +57,7 @@ class CustomPrivateMindMapList extends TStandardList
                         <i class="fa fa-search"></i>
                     </button>
                 </span>
+                <input type="text" name="q" value="'. $q .'" class="form-control" placeholder="Pesquisar meus mapas..."/>
             </div>';
 
         $this->search_btn = new TPanelGroup('');

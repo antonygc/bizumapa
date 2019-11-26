@@ -8,6 +8,14 @@ class MindMapPlugin extends TPage
 
         parent::__construct();
 
+        $subsc_ok = CustomSubscriptionInterface::checkSubscription();
+
+        if (!$subsc_ok) {
+            AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
+            return;
+        }
+
+
         $iframe = new TElement('iframe');
         $iframe->src = "plugin.php?" . http_build_query($_REQUEST);;
         $iframe->frameborder = "0";

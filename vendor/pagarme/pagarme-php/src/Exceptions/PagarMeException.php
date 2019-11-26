@@ -17,7 +17,7 @@ final class PagarMeException extends \Exception
     /**
      * @var string
      */
-    private $errorMessage;
+    public $errorMessage;
 
     /**
      * @param string $type

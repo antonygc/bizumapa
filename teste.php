@@ -6,7 +6,7 @@ require 'vendor/autoload.php';
 $pagarme = new PagarMe\Client('ak_test_tyzdxe39mTDFsC0Bfdwlx3hYafC5TH');
 
 $paidBoleto = $pagarme->transactions()->simulateStatus([
-  'id' => '7373502',
+  'id' => '7373505',
   'status' => 'paid'
 ]);
 

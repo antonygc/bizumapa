@@ -14,9 +14,6 @@ class CustomPublicMindMapList extends TStandardList
      */
     public function __construct()
     {
-
-        CustomSubscriptionInterface::checkSubscription($redirect=true);
-
         parent::__construct();
 
         $this->createSearchForm();
@@ -33,6 +30,13 @@ class CustomPublicMindMapList extends TStandardList
         $container->add($this->form);
         $container->add($panel);
         
+        $subsc_ok = CustomSubscriptionInterface::checkSubscription();
+
+        if (!$subsc_ok) {
+            AdiantiCoreApplication::loadPage('CustomSubscriptionForm');
+            return;
+        }
+
         parent::add($container);
     }
 

@@ -7,7 +7,8 @@ class PluginRenderer
 	
 	function __construct()
 	{
-		session_id($_COOKIE['PHPSESSID']);
+		// session_id($_COOKIE['PHPSESSID']);
+		// session_id();
 		session_start();
 
 
@@ -30,7 +31,7 @@ class PluginRenderer
 
 		if ($this->request['scope'] == 'public') {
 
-			if (!CustomAppUtils::isAdmin()) {
+			if (!CustomApplicationUtils::isAdmin()) {
 				$permission = 'VIEW';
 			} 
 
@@ -63,7 +64,7 @@ class PluginRenderer
 	{
 		try 
 		{ 
-		    TTransaction::open('permission'); // open transaction 
+		    TTransaction::open(DEFAULT_DB); // open transaction 
 		    $mindmap = new $model($id); 
 		    TTransaction::close(); // Closes the transaction 
  		} 
