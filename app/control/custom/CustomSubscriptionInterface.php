@@ -52,9 +52,8 @@ class CustomSubscriptionInterface
 		if ($is_trial_valid) {
 
 			if ($obj) {
-				$alert = '<div class="talert alert alert-dismissible alert-info" role="alert">
-							Período de avaliação
-					 	  </div>';
+				$days = CustomSubscriptionInterface::getFreeTrialDays();
+				$alert = CustomSubscriptionInterface::getAlertHTML($days);
 				$obj->addElement($alert);
 			}
 
@@ -219,6 +218,24 @@ class CustomSubscriptionInterface
 			CustomApplicationUtils::exceptionHandler($e);
 		
 		}
+	}
+
+	public static function getFreeTrialDays()
+	{				
+		$start = new DateTime(TSession::getValue('usercreation'));
+		$now = new DateTime();
+		$diff = $start->diff($now);	
+		return 5 - $diff->d;
+	}
+
+	public static function getAlertHTML($days)
+	{
+		$alert = '<div class="talert alert alert-dismissible alert-info" role="alert">
+					<div style="text-align:center"><b>Você possui mais %days% dias grátis. <a href="index?class=CustomSubscriptionForm">VER ASSINATURA</a></b></div>
+			 	  </div>';
+
+		return str_replace('%days%', $days, $alert);
+
 	}
 
 }
