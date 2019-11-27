@@ -15,7 +15,20 @@ class CustomSubscriptionInterface
 	public static $STATUS_UNPAID    = 'unpaid';
 	public static $STATUS_PENDING   = 'pending_payment';
 	public static $STATUS_TRIALING  = 'trialing';
-	public static $STATUS_CANCELLED = 'canceled';
+	public static $STATUS_CANCELED  = 'canceled';
+
+	public static $BR_STATUS_PAID      = 'Pago';
+	public static $BR_STATUS_ENDED     = 'Finalizado';
+	public static $BR_STATUS_UNPAID    = 'Não Pago';
+	public static $BR_STATUS_PENDING   = 'Pagamento Pendente';
+	public static $BR_STATUS_TRIALING  = 'Período de Avaliação';
+	public static $BR_STATUS_CANCELED  = 'Cancelada';
+
+	public static $METHOD_CARD    = 'credit_card';
+	public static $METHOD_BOLETO  = 'boleto';
+
+	public static $BR_METHOD_CARD    = 'Cartão de Crédito';
+	public static $BR_METHOD_BOLETO  = 'Boleto';
 
 	public static $TRIAL_PERIOD = '+1 day';
 	public static $SUBSC_PERIOD = '+1 day';
@@ -114,7 +127,7 @@ class CustomSubscriptionInterface
 			case CustomSubscriptionInterface::$STATUS_PAID:
 				return TRUE;
 
-			case CustomSubscriptionInterface::$STATUS_CANCELLED:
+			case CustomSubscriptionInterface::$STATUS_CANCELED:
 				$is_valid = CustomSubscriptionInterface::checkExpirationDate(
 					$subsc_obj->current_period_start,
 					CustomSubscriptionInterface::$SUBSC_PERIOD
@@ -235,7 +248,14 @@ class CustomSubscriptionInterface
 			 	  </div>';
 
 		return str_replace('%days%', $days, $alert);
+	}
 
+	public static function translate($value)
+	{
+		$class_vars = get_class_vars(__CLASS__);
+		$key = array_search($value, $class_vars);
+		$key = 'BR_' . $key;
+		return $class_vars[$key];
 	}
 
 }

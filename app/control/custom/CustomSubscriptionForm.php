@@ -10,8 +10,6 @@ class CustomSubscriptionForm extends TPage
 	{
         parent::__construct();
 
-        // echo var_dump($_REQUEST);
-
         if ( !empty($_REQUEST['data']) ) {
 
         	$this->startSubscription();
@@ -23,8 +21,6 @@ class CustomSubscriptionForm extends TPage
        	if ($id) {
 
        	    $subs = CustomSubscriptionInterface::getSubscriptionObj($id);
-
-            // echo var_dump($subs);
 	        $this->html = $this->getSubscriptionStatusForm($subs);
 
        	} else {
@@ -103,12 +99,12 @@ class CustomSubscriptionForm extends TPage
         $expires->setSize('100%');
 
         $id->setValue($subs->id);
-        $status->setValue($subs->status);
+        $status->setValue(CustomSubscriptionInterface::translate($subs->status));
         $plan->setValue($subs->plan->name);
         $created->setValue($subs->current_period_start);
         $expires->setValue($subs->current_period_end);
         $value->setValue($subs->plan->amount/100);
-        $paymethod->setValue($subs->payment_method);
+        $paymethod->setValue(CustomSubscriptionInterface::translate($subs->payment_method));
 
         $label_style = 'text-align:left;border-bottom:1px solid #c0c0c0;width:100%';
 
