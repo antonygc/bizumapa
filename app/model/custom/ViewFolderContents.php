@@ -10,6 +10,7 @@
 	    {
 	        parent::__construct($item_id);
 			parent::addAttribute('item_name');
+			parent::addAttribute('item_last_update');
 			parent::addAttribute('user_id');
 			parent::addAttribute('item_type');
 			parent::addAttribute('parent_id');

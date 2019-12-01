@@ -106,9 +106,10 @@ class CustomPublicMindMapList extends TStandardList
         
         // creates the datagrid columns
         $column_id                  = new TDataGridColumn('id', 'ID', 'center');
-        $column_name                = new TDataGridColumn('name', 'Mapa Mental', 'left', '30%');
+        $column_name                = new TDataGridColumn('name', 'Mapa Mental', 'left');
         $column_theme_name          = new TDataGridColumn('theme->name', 'Matéria', 'left');
         $column_subject_matter_name = new TDataGridColumn('subject_matter->name', 'Assunto', 'left');
+        $column_last_update         = new TDataGridColumn('last_update', 'Última Atualização', 'left');
 
         // add the columns to the DataGrid
 
@@ -119,15 +120,16 @@ class CustomPublicMindMapList extends TStandardList
         $this->datagrid->addColumn($column_name);
         $this->datagrid->addColumn($column_theme_name);
         $this->datagrid->addColumn($column_subject_matter_name);
+        $this->datagrid->addColumn($column_last_update);
 
-        // creates the datagrid column actions
-        $order_id = new TAction(array($this, 'onReload'));
-        $order_id->setParameter('order', 'id');
-        $column_id->setAction($order_id);
-        
+        // creates the datagrid column actions   
         $order_name = new TAction(array($this, 'onReload'));
         $order_name->setParameter('order', 'name');
         $column_name->setAction($order_name);
+
+        $order_last_update = new TAction(array($this, 'onReload'));
+        $order_last_update->setParameter('order', 'last_update');
+        $column_last_update->setAction($order_last_update);
 
         $this->createActions();
         
@@ -280,6 +282,8 @@ class CustomPublicMindMapList extends TStandardList
             $mindmap = new CustomPrivateMindMap; 
             $mindmap->name = $params['name']; 
             $mindmap->content = $public_mindmap->content;
+            $now = new DateTime();
+            $mindmap->last_update = $now->format("Y-m-d H:i:s");
             $mindmap->user_id = TSession::getValue('userid');
             $mindmap->folder_id = $params['folder_id']; ;
             $mindmap->store();

@@ -14,6 +14,7 @@ class CustomPrivateMindMap extends TRecord
         parent::__construct($id);
         parent::addAttribute('name');
         parent::addAttribute('content');
+        parent::addAttribute('last_update');
         parent::addAttribute('user_id');
         parent::addAttribute('folder_id');
     }

@@ -24,7 +24,8 @@ CREATE TABLE custom_public_mind_map (
 	id INT PRIMARY KEY NOT NULL, 
 	name VARCHAR(100) NOT NULL,
 	content TEXT, # 65,535 chars
-	theme_id INT NOT NULL , 
+	last_update TIMESTAMP NOT NULL,   
+	theme_id INT NOT NULL ,
 	subject_matter_id INT NOT NULL , 
 	FOREIGN KEY(theme_id) REFERENCES custom_theme(id),
 	FOREIGN KEY(subject_matter_id) REFERENCES custom_subject_matter(id)
@@ -46,16 +47,15 @@ CREATE TABLE custom_private_mind_map (
 	id INT PRIMARY KEY NOT NULL, 
 	name VARCHAR(100) NOT NULL,
 	content TEXT, # 65,535 chars
+	last_update TIMESTAMP NOT NULL,
 	user_id INT NOT NULL, 
 	folder_id INT NOT NULL,
-	theme_id INT, 
-	subject_matter_id INT,
 	FOREIGN KEY(user_id) REFERENCES system_user(id),
-	FOREIGN KEY(folder_id) REFERENCES custom_folder(id),	 
-	FOREIGN KEY(theme_id) REFERENCES custom_theme(id),
-	FOREIGN KEY(subject_matter_id) REFERENCES custom_subject_matter(id)
+	FOREIGN KEY(folder_id) REFERENCES custom_folder(id),
     ) ENGINE=InnoDB;
 
+-- ALTER TABLE custom_private_mind_map
+-- ADD last_update TIMESTAMP NOT NULL;
 
 INSERT INTO custom_folder VALUES(1, 'Meus Mapas Mentais', NULL, 1);
 
@@ -69,6 +69,7 @@ INSERT INTO custom_folder VALUES(1, 'Meus Mapas Mentais', NULL, 1);
 CREATE OR REPLACE VIEW view_folder_contents AS
 SELECT f.id as item_id, 
 	   f.name as item_name, 
+	   '0000-00-00 00:00:00' as item_last_update,
 	   f.user_id as user_id, 
 	   'folder' as item_type, 
 	   f.parent_id as parent_id
@@ -76,6 +77,7 @@ FROM custom_folder as f
 UNION ALL
 SELECT pmm.id as item_id, 
 	   pmm.name as item_name, 
+	   pmm.last_update as item_last_update,
 	   pmm.user_id as user_id, 
 	   'mindmap' as item_type, 
 	   pmm.folder_id as parent_id

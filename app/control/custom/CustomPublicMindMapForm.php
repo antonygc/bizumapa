@@ -67,6 +67,8 @@ class CustomPublicMindMapForm extends TPage
             $object = new CustomPublicMindMap;
             $object->fromArray( $param );
             $object->content = '{"root":{"data":{"id":"bychb1sczif4","created":1573415673472,"text":"Tópico"},"children":[]},"template":"right","theme":"fresh-blue","version":"1.4.33"}';
+            $now = new DateTime(); 
+            $object->last_update = $now->format("Y-m-d H:i:s");
             $object->store();
             // $object->clearParts();
             

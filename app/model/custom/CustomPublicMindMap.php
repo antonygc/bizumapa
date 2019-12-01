@@ -14,6 +14,7 @@ class CustomPublicMindMap extends TRecord
         parent::__construct($id);
         parent::addAttribute('name');
         parent::addAttribute('content');
+        parent::addAttribute('last_update');
         parent::addAttribute('theme_id');
         parent::addAttribute('subject_matter_id');
     }

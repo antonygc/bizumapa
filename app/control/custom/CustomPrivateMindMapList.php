@@ -121,7 +121,8 @@ class CustomPrivateMindMapList extends TStandardList
         // creates the datagrid columns
         // $column_id                  = new TDataGridColumn('id', 'ID', 'center', 50);
         $col_item_type = new TDataGridColumn('item_type', 'Tipo', 'center', '15%');
-        $col_item_name = new TDataGridColumn('item_name', 'Item', 'left');
+        $col_item_name = new TDataGridColumn('item_name', 'Item', 'left', '30%');
+        $col_item_last_update = new TDataGridColumn('item_last_update', 'Última Atualização', 'left');
 
         $col_item_type->setTransformer( function($value, $object, $row) {
             $div = new TElement('span');
@@ -134,9 +135,20 @@ class CustomPrivateMindMapList extends TStandardList
             return $div;
         });
 
+        $col_item_last_update->setTransformer( function($value, $object, $row) {
+            $div = new TElement('span');
+            if ($object->item_last_update == '0000-00-00 00:00:00') {
+                $div->add('');
+            } else {
+                $div->add($object->item_last_update);
+            }
+            return $div;
+        });        
+
         // add the columns to the DataGrid
         $this->datagrid->addColumn($col_item_type);
         $this->datagrid->addColumn($col_item_name);
+        $this->datagrid->addColumn($col_item_last_update);
 
         // creates the datagrid column actions
         $order_item_name = new TAction(array($this, 'onReload'));
@@ -146,6 +158,10 @@ class CustomPrivateMindMapList extends TStandardList
         $order_item_type = new TAction(array($this, 'onReload'));
         $order_item_type->setParameter('order', 'item_type');
         $col_item_type->setAction($order_item_type);
+
+        $order_item_last_update = new TAction(array($this, 'onReload'));
+        $order_item_last_update->setParameter('order', 'item_last_update');
+        $col_item_last_update->setAction($order_item_last_update);
 
         $this->createActions();
         

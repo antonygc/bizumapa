@@ -132,6 +132,8 @@ class PluginRenderer
 		    TTransaction::open('permission');
 		    $mindmap = new $model($id); 
 		    $mindmap->content = $data;
+		    $now = new DateTime();
+		    $mindmap->last_update = $now->format("Y-m-d H:i:s");
 		    $mindmap->store();
 		    TTransaction::close();  
  		} 
