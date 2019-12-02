@@ -20,11 +20,13 @@ CREATE TABLE system_user (
     id INTEGER PRIMARY KEY NOT NULL,
     name varchar(100),
     login varchar(100),
-    password varchar(100),
-    email varchar(100),
+    password varchar(100) NOT NULL,
+    email varchar(100) NOT NULL,
     creation timestamp NOT NULL,
     subscription varchar(100),
-    frontpage_id int, system_unit_id int references system_unit(id), active char(1),
+    frontpage_id int, 
+    system_unit_id int references system_unit(id), 
+    active char(1),
     FOREIGN KEY(frontpage_id) REFERENCES system_program(id));
     
 -- ALTER TABLE system_user ADD creation timestamp; 

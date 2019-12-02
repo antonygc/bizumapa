@@ -27,8 +27,8 @@ class SystemRegistrationForm extends TPage
         $this->form->setFormTitle( _t('User registration') );
         
         // create the form fields
-        $login      = new TEntry('login');
-        $name       = new TEntry('name');
+        // $login      = new TEntry('login');
+        // $name       = new TEntry('name');
         $email      = new TEntry('email');
         $password   = new TPassword('password');
         $repassword = new TPassword('repassword');
@@ -38,14 +38,14 @@ class SystemRegistrationForm extends TPage
         //$this->form->addActionLink( _t('Back'),  new TAction(['LoginForm','onReload']), 'fa:arrow-circle-o-left blue' );
         
         // define the sizes
-        $name->setSize('100%');
-        $login->setSize('100%');
+        // $name->setSize('100%');
+        // $login->setSize('100%');
         $password->setSize('100%');
         $repassword->setSize('100%');
         $email->setSize('100%');
         
-        $this->form->addFields( [new TLabel(_t('Login'), 'red')],    [$login] );
-        $this->form->addFields( [new TLabel(_t('Name'), 'red')],     [$name] );
+        // $this->form->addFields( [new TLabel(_t('Login'), 'red')],    [$login] );
+        // $this->form->addFields( [new TLabel(_t('Name'), 'red')],     [$name] );
         $this->form->addFields( [new TLabel(_t('Email'), 'red')],    [$email] );
         $this->form->addFields( [new TLabel(_t('Password'), 'red')], [$password] );
         $this->form->addFields( [new TLabel(_t('Password confirmation'), 'red')], [$repassword] );
@@ -79,20 +79,37 @@ class SystemRegistrationForm extends TPage
             // open a transaction with database 'permission'
             TTransaction::open('permission');
             
-            if( empty($param['login']) )
-            {
-                throw new Exception(TAdiantiCoreTranslator::translate('The field ^1 is required', _t('Login')));
-            }
-            
-            if( empty($param['name']) )
-            {
-                throw new Exception(TAdiantiCoreTranslator::translate('The field ^1 is required', _t('Name')));
-            }
-            
             if( empty($param['email']) )
             {
                 throw new Exception(TAdiantiCoreTranslator::translate('The field ^1 is required', _t('Email')));
+            } else {
+
+                if (!filter_var($param['email'], FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception('Formato de Email incorreto');
+                }
+
+                $domain = substr(strrchr($param['email'], "@"), 1);
+                $blacklist = file_get_contents('app/blacklists/email.txt');
+                $pos = strpos($blacklist, '/' . $domain . '/');
+
+                if ($pos) {
+                    throw new Exception("Domínio inválido");
+                }
             }
+
+            $param['login'] = $param['email'];
+            $param['name'] = $param['email'];
+
+            // if( empty($param['login']) )
+            // {
+                // throw new Exception(TAdiantiCoreTranslator::translate('The field ^1 is required', _t('Login')));
+            // }
+            
+            // if( empty($param['name']) )
+            // {
+            //     throw new Exception(TAdiantiCoreTranslator::translate('The field ^1 is required', _t('Name')));
+            // }
+            
             
             if( empty($param['password']) )
             {
@@ -104,10 +121,10 @@ class SystemRegistrationForm extends TPage
                 throw new Exception(TAdiantiCoreTranslator::translate('The field ^1 is required', _t('Password confirmation')));
             }
             
-            if (SystemUser::newFromLogin($param['login']) instanceof SystemUser)
-            {
-                throw new Exception(_t('An user with this login is already registered'));
-            }
+            // if (SystemUser::newFromLogin($param['login']) instanceof SystemUser)
+            // {
+            //     throw new Exception(_t('An user with this login is already registered'));
+            // }
             
             if (SystemUser::newFromEmail($param['email']) instanceof SystemUser)
             {
